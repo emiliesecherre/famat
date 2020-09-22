@@ -1,0 +1,47 @@
+Package: famat
+Title: Functionnal annotation of metabolic and transcriptomic data
+Version: 0.99.0
+Description: Allow users to perform a pathway enrichment analysis on a list of genes and metabolites, then to visualize and filter results throught a Rshiny interface. Results are an heatmap showing which elements from the list are in some pathways, a GO enrichment analysis using MF and BP, and some informations about genes, metabolites and direct interactions between them inside pathways. 
+Authors@R: 
+    person(given = "Emilie",
+           family = "Secherre",
+           role = c("aut", "cre"),
+           email = "emisecherre@gmail.com",
+           comment = c(ORCID = "0000-0001-5343-6324"))
+License: GPL-3           
+LazyData: false
+Depends: 
+    R (>= 4.0)
+Imports:
+    KEGGREST,
+    MPINet,
+    dplyr,
+    gprofiler2,
+    rWikiPathways,
+    reactome.db,
+    stringr,
+    biomaRt,
+    graphite,
+    GO.db,
+    UniprotR,
+    ontologyIndex,
+    tidyr,
+    shiny,
+    shinydashboard,
+    shinyBS,
+    plotly,
+    magrittr,
+    DT,
+    clusterProfiler,
+    org.Hs.eg.db
+Suggests: 
+    BiocStyle,
+    knitr,
+    rmarkdown,
+    testthat
+biocViews: FunctionalPrediction, GeneSetEnrichment, Pathways, GO, Reactome, KEGG
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr
+URL: https://github.com/emiliesecherre/famat

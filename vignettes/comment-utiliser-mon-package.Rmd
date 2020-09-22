@@ -1,0 +1,36 @@
+---
+title: 'Famat : determine functional links between metabolites and genes'
+author: "Emilie Secherre"
+package: famat
+output: 
+    BiocStyle::html_document
+vignette: >
+    %\VignetteIndexEntry{Vignette Title}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}  
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+# Introduction
+
+The aim of `r Rpackage("famat")` is to allow users to determine functional links between metabolites and genes. These metabolites and genes lists may be related to a specific experiment/study, but `r Rpackage("famat")` only needs a gene symbols list and a Kegg Compound ids list. Using these lists, `r Rpackage("famat")` performs pathway enrichment analysis, direct interactions between elements inside pathways extraction, GO terms enrichment analysis, calculation of user's elements centrality (number of direct interactions between an element and others inside a pathway) and extraction of information related to user's elements. 
+
+Functions available are :
+- path_enrich : pathways enrichment analysis
+- interactions : direct interactions and centrality
+- compl_data : GO terms enrichment analysis and user's elements data extraction
+- rshiny ; use of previous function's data in a shiny interface
+
+# Installation
+
+```{r load_famat}
+BiocManager::install("famat")
+library(famat)
+```
+
