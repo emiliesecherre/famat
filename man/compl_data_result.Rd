@@ -12,7 +12,7 @@
 }
 \usage{data("compl_data_result")}
 \format{
-    List of 25 items.
+    List of 23 items.
     \describe{
         \item{\code{heatmap}}{
             Dataframe heatmap-like, with in abscissa elements of pathways
@@ -102,14 +102,6 @@
         }
         \item{\code{sub}}{
             Matrix trait-like with pathway and element informations instead
-            of "X"
-        }
-        \item{\code{quanti}}{
-            Matrix trait-like with user's quantitative values instead
-            of "X"
-        }
-        \item{\code{updown}}{
-            Matrix trait-like with user's "UP"/"DOWN" values instead
             of "X"
         }
     }

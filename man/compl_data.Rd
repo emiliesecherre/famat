@@ -94,12 +94,6 @@
     \item{sub}{
         Matrix trait-like with pathway and element informations instead of "X"
     }
-    \item{quanti}{
-        Matrix trait-like with user's quantitative values instead of "X"
-    }
-    \item{updown}{
-        Matrix trait-like with user's "UP"/"DOWN" values instead of "X"
-    }
     This list is used by \code{rshiny} function.
 }
 \references{

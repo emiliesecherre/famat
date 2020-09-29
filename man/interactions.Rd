@@ -61,7 +61,7 @@
     This list is used by \code{compl_data} function.
 }
 \references{
-    Luna, A., Babur, O., Aksoy, A. B, Demir, E., Sander, C. (2015). “PaxtoolsR:
+    Luna, A., Babur, O., Aksoy, A. B, Demir, E., Sander, C. (2015).“PaxtoolsR:
     Pathway Analysis in R Using Pathway Commons.” Bioinformatics.
 
     Sales G, Calura E, Cavalieri D, Romualdi C (2012). “graphite - a

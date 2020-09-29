@@ -1,6 +1,6 @@
 setwd(stringr::str_sub(system.file("NAMESPACE",package="famat"),1,32))
-genes=data.frame(c("ACAA1","SLC6A12"),c(1.740000e-09,1.136095e-03),c("DOWN","DOWN"))
-meta=data.frame(c("C00002","C00719"),c(0.8929425,3.0269316),c("DOWN","UP"))
+genes=c("ACAA1","SLC6A12")
+meta=c("C00002","C00719")
 listk=path_enrich("KEGG",meta,genes)
 listr=path_enrich("REAC",meta,genes)
 listw=path_enrich("WP",meta,genes)

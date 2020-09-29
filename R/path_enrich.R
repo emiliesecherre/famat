@@ -45,13 +45,10 @@ meta_path<-function(meta, db){
 
 ##put pathway enrichment analysis results together and add pathways ids
 path_enrich<-function(source, metabo, genes){
-    ##genes and metabolites lists
-    genes_list<-genes[, 1]
-    meta_list<-metabo[, 1]
     ##perform pathway enrichment analysis on user's gene list
-    resgene<-gene_path(genes_list, source)
+    resgene<-gene_path(genes, source)
     ##perform pathway enrichment analysis on user's metabolites list
-    resmeta<-meta_path(meta_list, source)
+    resmeta<-meta_path(metabo, source)
     ##add pathways ids
     resmeta<-cbind(resmeta, id=rep(NA, nrow(resmeta)))
     if(source == "KEGG"){

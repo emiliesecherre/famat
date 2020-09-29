@@ -34,8 +34,8 @@
     A list containing :
     \item{resmeta}{Results of metabolites pathway enrichment analysis}
     \item{resgene}{Results of genes pathway enrichment analysis}
-    \item{genes}{Dataframe containing genes and values related to them}
-    \item{metabo}{Dataframe containing metabolites and values related to them}
+    \item{genes}{Vector containing genes}
+    \item{metabo}{Vector containing metabolites}
     This list is used by \code{interactions} function.
 }
 \references{

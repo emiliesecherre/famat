@@ -1,13 +1,8 @@
-## version 0.99.0
+Changes in version 0.99.0 (2020-09-24)
++ updated version for Bioconductor submission
 
----
+Changes in version 0.0.0.9000 (2020-09-01)
++ creation of the package
 
 
-## version 0.0.0.9000
-
----
-
-### NEWS.md setup
-
-- added NEWS.md creation with newsmd
 

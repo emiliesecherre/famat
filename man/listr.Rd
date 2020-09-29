@@ -17,12 +17,8 @@
             Results of metabolites pathway enrichment analysis
         }
         \item{\code{resgene}}{Results of genes pathway enrichment analysis}
-        \item{\code{gened}}{
-            Dataframe containing genes and values related to them
-        }
-        \item{\code{metad}}{
-            Dataframe containing metabolites and values related to them
-        }
+        \item{\code{gened}}{Vector containing genes}
+        \item{\code{metad}}{Vector containing metabolites}
     }
 }
 \source{

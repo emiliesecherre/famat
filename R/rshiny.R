@@ -3,7 +3,7 @@
 #####UI#####
 ui<-function(types, genetype, gotermsgene){
     ui <- shinydashboard::dashboardPage(
-        skin <- "blue",
+        skin = "blue",
         shinydashboard::dashboardHeader(title="Famat"),
         shinydashboard::dashboardSidebar(
             shinydashboard::sidebarMenu(
@@ -98,7 +98,7 @@ ui<-function(types, genetype, gotermsgene){
                                         choices = c("all", unique(types$root)),
                                         selected="all", multiple=FALSE)),
                                     shiny::column(4, align="center", offset=0,
-                                        shiny::selectInput("genetype",
+                                        shiny::selectInput("typegene",
                                             "Genes types : ",choices = c("all",
                                             names(genetype)), selected="all",
                                             multiple=TRUE)),
@@ -181,22 +181,22 @@ rshiny=function(listdata){
     gotermsgene<-c(allResBP[allResBP[, 1] %in% go_genelist$go_id, 2],
                     allResMF[allResMF[, 1] %in% go_genelist$go_id, 2])
     server<-function(input, output, session) {
-        v<-shiny::reactiveValues(selecgo<-gotermsgene, info_bubble<-"",
-                                selec_genetype<-names(genetype),rows<-vector(),
-                                selec_pathtype<-unique(types$root),
-                                selec_goterm<-vector(), a_not_b<-vector(),
-                                selec_inter<-c("g/g","g/m","m/m"),
-                                column<-vector(), select_intertype<-vector(),
-                                heatmap_shiny<-heatmap, metatab_shiny<-metatab,
-                                genetab_shiny<-genetab, intetab_shiny<-intetab,
-                                x1_selected_rows <- seq_len(nrow(heatmap)),
-                                x2_selected_rows <- seq_len(nrow(genetab)),
-                                x3_selected_rows <- seq_len(nrow(metatab)),
-                                x4_selected_rows<-seq_len(nrow(intetab)),
-                                walk<-vector(),mode<-"a AND b",history<-list(),
-                                gomf<-gomf_tab, gobp<-gobp_tab,
-                                elements<-vector(),
-                                histo_tab<-data.frame(histo=character()))
+        v<-shiny::reactiveValues(selecgo=gotermsgene, info_bubble="",
+                                selec_genetype=names(genetype),rows=vector(),
+                                selec_pathtype=unique(types$root),
+                                selec_goterm=vector(), a_not_b=vector(),
+                                selec_inter=c("g/g","g/m","m/m"),
+                                column=vector(), select_intertype=vector(),
+                                heatmap_shiny=heatmap, metatab_shiny=metatab,
+                                genetab_shiny=genetab, intetab_shiny=intetab,
+                                x1_selected_rows=seq_len(nrow(heatmap)),
+                                x2_selected_rows=seq_len(nrow(genetab)),
+                                x3_selected_rows=seq_len(nrow(metatab)),
+                                x4_selected_rows=seq_len(nrow(intetab)),
+                                walk=vector(),mode="a AND b",history=list(),
+                                gomf=gomf_tab, gobp=gobp_tab,
+                                elements=vector(),
+                                histo_tab=data.frame(histo=character()))
 
         #reset button action
         shiny::observeEvent(input$reset, {
@@ -224,7 +224,7 @@ rshiny=function(listdata){
             v$walk<-vector()
             v$a_not_b<-vector()
 
-            shiny::updateSelectInput(session, "genetype", "Genes types : ",
+            shiny::updateSelectInput(session, "typegene", "Genes types : ",
                         choices = c("all", v$selec_genetype), selected="all")
             shiny::updateSelectInput(session, "pathtype", "Categories : ",
                         choices = c("all", v$selec_pathtype), selected="all")
@@ -354,7 +354,7 @@ rshiny=function(listdata){
 
             shiny::updateSelectInput(session, "pathtype", "Categories : ",
                         choices=c("all", v$selec_pathtype), selected="all")
-            shiny::updateSelectInput(session, "genetype", "Genes types : ",
+            shiny::updateSelectInput(session, "typegene", "Genes types : ",
                         choices=c("all", v$selec_genetype), selected="all")
             shiny::updateSelectInput(session,"gotype","Enriched GO terms : ",
                                 choices = c("all", v$selecgo), selected="all")
@@ -507,7 +507,7 @@ rshiny=function(listdata){
 
             shiny::updateSelectInput(session, "gotype", "Enriched GO terms : ",
                                 choices = c("all", v$selecgo), selected="all")
-            shiny::updateSelectInput(session, "genetype", "Genes types : ",
+            shiny::updateSelectInput(session, "typegene", "Genes types : ",
                         choices = c("all", v$selec_genetype), selected="all")
             shiny::updateSelectInput(session, "pathtype", "Categories : ",
                         choices = c("all", v$selec_pathtype), selected="all")
@@ -553,10 +553,10 @@ rshiny=function(listdata){
         }, ignoreNULL=FALSE)
 
         #genes categories selected
-        shiny::observeEvent(input$genetype, {
-            selected<-input$genetype
+        shiny::observeEvent(input$typegene, {
+            selected<-input$typegene
             if(length(selected) == 0){
-                shiny::updateSelectInput(session, "genetype", "Genes types : ",
+                shiny::updateSelectInput(session, "typegene", "Genes types : ",
                         choices = c("all", v$selec_genetype), selected="all")
                 selected="all"
             }
@@ -900,7 +900,7 @@ rshiny=function(listdata){
 
             shiny::updateSelectInput(session, "gotype", "Enriched GO terms : ",
                                 choices = c("all", v$selecgo), selected="all")
-            shiny::updateSelectInput(session, "genetype", "Genes types : ",
+            shiny::updateSelectInput(session, "typegene", "Genes types : ",
                             choices=c("all", v$selec_genetype), selected="all")
             shiny::updateSelectInput(session, "pathtype", "Categories : ",
                             choices=c("all", v$selec_pathtype), selected="all")

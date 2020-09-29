@@ -18,38 +18,6 @@ rm_df<-function(df, col){
     return(df)
 }
 
-##extract direct interactions between elements using graphite. KEGG REACTOME
-graphit<-function(human, pathtot){
-    pathways<-as.vector(pathtot$name[!(is.na(pathtot$name))])
-    interactions<-data.frame(sf=character(), from=character(), st=character(),
-                        to=character(), direc=character(), link=character(),
-                        path=character())
-
-    for (k in seq_len(length(pathways))){
-        graph_res<-human[[pathways[k]]]
-        if(!(is.null(graph_res))){
-            graph_res<-graphite::convertIdentifiers(graph_res, "SYMBOL")
-            graph_res<-graphite::convertIdentifiers(graph_res, "CHEBI")
-            mixed<-graphite::edges(graph_res, which="mixed")
-
-            if(is.data.frame(mixed) && !(nrow(mixed) == 0)){
-                for (p in seq_len(nrow(mixed))){
-                    if(mixed[p, 1] == "CHEBI"){
-                        mixed[p, 2]<-paste("CHEBI:", mixed[p, 2], sep="")
-                    }
-                    if(mixed[p, 3] == "CHEBI"){
-                        mixed[p, 4]<-paste("CHEBI:", mixed[p, 4], sep="")
-                    }
-                }
-                results<-cbind(mixed, path=rep(graph_res@id, nrow(mixed)))
-                interactions<-rbind(interactions, results)
-            }
-        }
-    }
-    interactions<-interactions[,c(2, 6, 4, 7)]
-    return(interactions)
-}
-
 ##gather all pathways obtained in pathway enrichment analysis
 get_pathways<-function(resgk, resgr, resgw, resmk, resmr, resmw){
     pathway_tot<-data.frame(name=character(), id=character())
@@ -176,7 +144,7 @@ filter_inter<-function(inter){
 interactions<-function(listk, listr, listw){
     resmetak<-listk[[1]]; resgenek<-listk[[2]]; resmetar<-listr[[1]]
     resgener<-listr[[2]]; resmetaw<-listw[[1]]; resgenew<-listw[[2]]
-    genes<-listk[[3]][,1]; meta<-listk[[4]][,1]
+    genes<-listk[[3]]; meta<-listk[[4]]
     pathtot<-get_pathways(resgenek, resgener, resgenew,
                             resmetak, resmetar, resmetaw)
     pathtotr<-pathtot[which(stringr::str_sub(pathtot$id, 1, 1)=="R"), ]
@@ -214,12 +182,7 @@ interactions<-function(listk, listr, listw){
     interac<-interactions_type(interac, meta, genes)
     list_filter<-filter_inter(interac)
     tagged<-list_filter[[1]]; no_path<-list_filter[[2]]
-    meta<-listk[[4]];genes=listk[[3]]
-    for(s in seq_len(nrow(meta))){
-        meta[s, 1]<-rm_vector(keggchebiname[which(
-            stringr::str_sub(keggchebiname[, 1], 5,
-                            nchar(keggchebiname[, 1])) %in% meta[s, 1]), 3])
-    }
+
     return(list(size, pathtot, tagged, namegeneid, keggchebiname, central,
                                                 no_path, genes, meta, ensembl))
 }

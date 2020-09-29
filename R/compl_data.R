@@ -969,8 +969,8 @@ compl_data<-function(listparam){
     size<-listparam[[1]]; pathways<-listparam[[2]]; tagged<-listparam[[3]];
     namegeneid<-listparam[[4]]; keggchebiname<-listparam[[5]];
     central<-listparam[[6]]; no_path<-listparam[[7]]; ensembl=listparam[[10]];
-    gene_list<-rm_vector(listparam[[8]][,1]);
-    meta_list<-rm_vector(listparam[[9]][,1]);list_elem<-c(gene_list, meta_list)
+    gene_list<-rm_vector(listparam[[8]]);
+    meta_list<-rm_vector(listparam[[9]]);list_elem<-c(gene_list, meta_list)
 
     sorted_path<-filter_path(tagged,size)
     listpath<-sort_hiera(sorted_path)
@@ -992,8 +992,8 @@ compl_data<-function(listparam){
     listype<-type_path(sorted_path, hierapath)
     types<-listype[[1]]; hierabrite<-listype[[2]]
     genetype<-type_elem(genetab,ensembl)
-    listparam[[8]]<-rm_df(listparam[[8]],c(1, 2, 3))
-    listparam[[9]]<-rm_df(listparam[[9]], c(1, 2, 3))
+    listparam[[8]]<-rm_vector(listparam[[8]])
+    listparam[[9]]<-rm_vector(listparam[[9]])
     listval<-values_shiny(heatmap, central, size, tagged, gene_list, meta_list)
     centrality<-listval[[1]]; inter_values<-listval[[2]]; sub<-listval[[3]]
     intetab<-cbind(intetab, cat=rep(NA, nrow(intetab)))
@@ -1005,9 +1005,8 @@ compl_data<-function(listparam){
     gobp_tab<-hieraGO("BP", allResBP, go_genelist)
     gomf_tab<-hieraGO("MF", allResMF, go_genelist)
     gomflist<-listgo(gomf_tab);gobplist<-listgo(gobp_tab)
-    quanti=NULL;updown=NULL
     return(list(heatmap, meta_list, allResBP, go_genelist, allResMF, types,
         genetype, metatab, genetab, intetab, gomf_tab, gobp_tab, gene_list,
         gomflist, gobplist, namegeneid,hierabrite, hierapath,save_cluster_elem,
-        centrality, inter_values, gene_notin, sub, quanti, updown))
+        centrality, inter_values, gene_notin, sub))
 }
