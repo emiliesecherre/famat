@@ -195,7 +195,7 @@ rshiny=function(listdata){
                                 x4_selected_rows=seq_len(nrow(intetab)),
                                 walk=vector(),mode="a AND b",history=list(),
                                 gomf=gomf_tab, gobp=gobp_tab,
-                                elements=vector(),
+                                elements=vector(),suspended = TRUE,
                                 histo_tab=data.frame(histo=character()))
 
         #reset button action
@@ -236,7 +236,8 @@ rshiny=function(listdata){
         })
 
         #click on heatmap cell : pop up with pathway informations
-        shiny::observeEvent(plotly::event_data("plotly_click", source = "x1"),{
+        observer <- shiny::observeEvent(plotly::event_data("plotly_click",
+                                        source = "x1"), suspended = TRUE, {
             v$x1_selected_rows <- plotly::event_data("plotly_click",
                                                         source = "x1")[["y"]]
             v$x1_selected_rows<-rev(c(seq_len(nrow(
@@ -1021,7 +1022,7 @@ rshiny=function(listdata){
                 subtitles<-sub[as.integer(row.names(v$heatmap_shiny)),
                                 which(colnames(sub) %in% colnames(tempor))]
 
-                plotly::plot_ly(
+                p <- plotly::plot_ly(
                     x=colnames(v$heatmap_shiny[, which(colnames(v$heatmap_shiny)
                     %in% save_cluster_elem)]), y = seq_along(y),
                     z = apply(data, 2, rev), type = "heatmap", source = "x1",
@@ -1034,8 +1035,14 @@ rshiny=function(listdata){
                                     margin =list(l=0, r=1200, b=100, t=50))
             }
             else{ #no heatmap printed
-                plotly::plotly_empty(type = "scatter", mode = 'lines')
+                p <- plotly::plotly_empty(type = "scatter", mode = 'lines')
             }
+            ## resume observer only if suspended
+            if(v$suspended) {
+                observer$resume()
+                v$suspended <- FALSE
+            }
+            return(p)
         })
         output$x2 <- DT::renderDataTable({
             input$x7_rows_selected
