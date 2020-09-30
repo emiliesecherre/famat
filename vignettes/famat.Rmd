@@ -92,7 +92,7 @@ interaction between user's elements) and a hierarchy parent-child is built
 with pathways and enriched GO terms. Then, dataframes containing information
 about elements, interactions and GO terms are created, with an heatmap showing
 which user's elements are in which pathways.
-```{r compldata}
+```{r compldata, message = FALSE}
 data(interactions_result)
 
 compl_data_result <- compl_data(interactions_result)
@@ -161,6 +161,3 @@ rshiny(compl_data_result)
 ```{r}
 sessionInfo()
 ```
-
-
-
