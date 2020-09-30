@@ -423,7 +423,7 @@ rshiny=function(listdata){
                 mf=v$gomf, bp=v$gobp, tg=v$genetab_shiny, tm=v$metatab_shiny,
                 ti=v$intetab_shiny, sgo=v$selecgo, spath=v$selec_pathtype,
                 sinter=v$selec_inter, segene=v$selec_genetype)
-            v$histo_tab[length(v$history), 1]<-paste("Pathways focus : ",
+            v$histo_tab[length(v$history), 1]<-paste("Updated : ",
                                 paste(input$pathtype, collapse=" "), sep="")
 
             v$rows<-v$column<-vector()
@@ -1122,7 +1122,7 @@ rshiny=function(listdata){
         output$walk<-shiny::renderText({
             input$x2_rows_selected
             input$x3_rows_selected
-            paste("walk :", paste(v$walk, collapse=" "), "\nexclus :",
+            paste("walk :", paste(v$walk, collapse=" "), "\nexcluded :",
                                     paste(v$a_not_b, collapse=" "), sep=" ")
         })
         output$firstblank<-shiny::renderText({

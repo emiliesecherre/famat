@@ -63,6 +63,8 @@ listr=path_enrich("REAC", meta, genes)
 ```
 Results are then stored into a list. This list must be used in "interactions"
 function.
+Pathways enrichment analysis is performed on genes using 
+`r CRANpkg("gprofiler2")` and on metabolites using `r CRANpkg("MPINet")`.
 
 # interactions
 
@@ -81,6 +83,10 @@ interactions_result = interactions(listk, listr, listw)
 ```
 Results are then stored into a list. This list must be used in "compl_data"
 function.
+Direct interactions were collected from BioPax, KGML and GPML files parsed 
+with `r Biocpkg("PaxtoolsR")`, `r Biocpkg("graphite")` and author's parsers.
+"Interactions" just get interactions of enriched pathways from this direct 
+interactions list.
 
 # compl_data
 
@@ -89,7 +95,8 @@ This function complete information about elements and pathway obtained with
 on genes, pathways obtained through pathways enrichment analysis are filtered
 (they must contain at least 1/5 elements in user's lists or a direct 
 interaction between user's elements) and a hierarchy parent-child is built 
-with pathways and enriched GO terms. Then, dataframes containing information
+with pathways and enriched GO terms. GO terms enrichment analysis is performed
+using `r Biocpkg("clusterProfiler")`. Then, dataframes containing information
 about elements, interactions and GO terms are created, with an heatmap showing
 which user's elements are in which pathways.
 ```{r compldata, message = FALSE}
@@ -103,14 +110,15 @@ function.
 # rshiny
 
 All results obtained with the three previous functions can be visualized using
-"rshiny" function. 
+"rshiny" function. `r CRANpkg("shiny")` is a R package allowing to create
+interfaces.
 
 ```{r, eval=FALSE}
 data(compl_data_result)
 
 rshiny(compl_data_result)
 ```
-After using this command line, the Shiny interface appear.
+After using this command line, the `r CRANpkg("shiny")` interface appear.
 
 ![test](./inte.png)
 Interface's tabs are: <br><ul>
@@ -138,7 +146,7 @@ Interface's tabs are: <br><ul>
 </ul>
 Finally, a "Reset" button was made to go back to the initial results.
 
-# how to use famat
+# Conclusion: how to use famat
 
 To conclude, `r Rpackage("famat")` has four important functions which have to
 be used one after another:
@@ -156,6 +164,27 @@ compl_data_result <- compl_data(interactions_result)
 
 rshiny(compl_data_result)
 ```
+
+# References
+
+<ul>
+    <li>Yanjun Xu, Chunquan Li and Xia Li (2013). MPINet: The package can 
+    implement the network-based metabolite pathway identification of pathways..
+    R package version 1.0. https://CRAN.R-project.org/package=MPINet</li>
+    <li>Liis Kolberg and Uku Raudvere (2020). gprofiler2: Interface to the
+    'g:Profiler' Toolset. R package version 0.2.0.
+    https://CRAN.R-project.org/package=gprofiler2 </li>
+    <li>Luna, A., Babur, O., Aksoy, A. B, Demir, E., Sander, C. (2015).
+    “PaxtoolsR: Pathway Analysis in R Using Pathway Commons.” 
+    Bioinformatics.</li>
+    <li>Sales G, Calura E, Cavalieri D, Romualdi C (2012). “graphite - a
+    Bioconductor package to convert pathway topology to gene network.” BMC
+    Bioinformatics. https://bmcbioinformatics.biomedcentral.com/articles/10 .
+    1186/1471-2105-13-20.</li>
+    <li>Guangchuang Yu, Li-Gen Wang, Yanyan Han and Qing-Yu He.clusterProfiler:
+    an R package for comparing biological themes among gene clusters. OMICS:
+    A Journal of Integrative Biology 2012, 16(5):284-287</li>
+</ul>
 
 # Session Info
 ```{r}
