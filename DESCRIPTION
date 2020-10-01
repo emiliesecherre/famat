@@ -1,6 +1,6 @@
 Package: famat
 Title: Functionnal analysis of metabolic and transcriptomic data
-Version: 0.99.0
+Version: 0.99.1
 Description: Allow users to perform a pathway enrichment analysis on a list of genes and metabolites, then to visualize and filter results throught a Rshiny interface. Results are an heatmap showing which elements from the list are in some pathways, a GO enrichment analysis using MF and BP, and some informations about genes, metabolites and direct interactions between them inside pathways. 
 Authors@R: 
     person(given = "Emilie",
