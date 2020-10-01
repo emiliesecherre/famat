@@ -1,4 +1,3 @@
-setwd(stringr::str_sub(system.file("NAMESPACE",package="famat"),1,32))
 genes=c("ACAA1","SLC6A12")
 meta=c("C00002","C00719")
 listk=path_enrich("KEGG",meta,genes)
