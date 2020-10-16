@@ -1,6 +1,6 @@
 # *News*
 
-# Changes in version 0.99.2 (2020-10-01)
+# Changes in version 0.99.2 (2020-10-16)
 
 * Changed loops by apply functions
 * Updated datasets documentation
