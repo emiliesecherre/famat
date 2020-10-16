@@ -412,8 +412,6 @@ rshiny=function(listdata){
             v$intetab_shiny<-intetab[intetab[, 1] %in% selected_inter, ]
 
             #histo
-            cat("v$histo_tab et v$history \n")
-            print(v$histo_tab)
             if(length(v$history) == 10){
                 v$history<-v$history[-1]
                 v$histo_tab=as.data.frame(v$histo_tab[-1,])
@@ -433,7 +431,6 @@ rshiny=function(listdata){
             hm_elements<-names(v$heatmap_shiny)
 
             pathselected<-v$heatmap_shiny[row.names(v$heatmap_shiny), 2]
-            cat("pathselected : ", pathselected, "\n")
             v$selec_pathtype<-vapply(seq_len(length(hierabrite)), function(h){
                 if(length(hierabrite[[h]][["name"]][hierabrite[[h]][["name"]]
                                                     %in% pathselected])>0){
@@ -442,7 +439,6 @@ rshiny=function(listdata){
                 else{list(NULL)}
             }, list(1))
             v$selec_pathtype<-rm_vector(unname(unlist(v$selec_pathtype)))
-            cat("hm_elements : ", hm_elements, "\n")
             #types d'interactions, types genes et go
             v$selec_genetype<-lapply(hierapath, function(h){
                 if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
@@ -585,7 +581,6 @@ rshiny=function(listdata){
                                                                 selected="all")
                 selected<-"all"
             }
-            cat("input$intetype : ", input$intetype, "\n")
             if(!("all" %in% selected)){
                 selected_inter<-rm_vector(intetab[intetab[,7] %in% selected,4])
                 v$select_intertype<-lapply(hierapath, function(h){
@@ -715,8 +710,6 @@ rshiny=function(listdata){
                 #GOTERMS
                 genes_in_walk<-v$walk[v$walk %in% genes]
                 walk_only_genes<-vector()
-                cat("genes_in_walk : ", genes_in_walk, "\n")
-                cat("v$walk : ", v$walk, "\n")
                 if (length(genes_in_walk)>0){
                     wi<-which(v$walk %in% genes_in_walk)
                     walk_only_genes<-c(walk_only_genes, v$walk[wi[1]])
@@ -772,8 +765,6 @@ rshiny=function(listdata){
                         }
                     }
 
-                    cat("prev_walk_gomf : ", prev_walk_gomf, "\n")
-                    cat("v$a_not_b : ", v$a_not_b, "\n")
                     hiera_gomf<-lapply(gomflist, function(g){
                         if(length(which(names(table(prev_walk_gomf %in%
                                                 g[["goterm"]])) == TRUE))>0){
@@ -790,7 +781,6 @@ rshiny=function(listdata){
                                                 as.integer(row.names(v$gomf))]
                     v$gomf<-v$gomf[as.character(hiera_gomf), ]
 
-                    cat("prev_walk_gobp : ", prev_walk_gobp, "\n")
                     hiera_gobp<-lapply(gobplist, function(g){
                         if(length(which(names(table(prev_walk_gobp %in%
                                                 g[["goterm"]])) == TRUE))>0){
@@ -863,7 +853,6 @@ rshiny=function(listdata){
                                             as.integer(row.names(v$gomf))]
                 v$gomf<-v$gomf[as.character(hiera_gomf), ]
 
-                cat("prev_walk_gobp : ", prev_walk_gobp, "\n")
                 hiera_gobp<-lapply(gobplist, function(g){
                     if(length(which(names(table(prev_walk_gobp %in%
                                                 g[["goterm"]])) == TRUE))>0){
@@ -896,7 +885,6 @@ rshiny=function(listdata){
             v$intetab_shiny<-intetab[intetab[, 1] %in% selected_inter, ]
 
             #histo
-            cat("v$history : ", v$history, "\n")
             if(length(v$history) == 10){
                 v$history<-v$history[-1]
                 v$histo_tab=as.data.frame(v$histo_tab[-1,])
@@ -917,7 +905,6 @@ rshiny=function(listdata){
             v$selecgo<-v$selec_inter<-vector()
 
             pathselected<-v$heatmap_shiny[row.names(v$heatmap_shiny), 2]
-            cat("pathselected : ", pathselected, "\n")
             v$selec_pathtype<-vapply(seq_len(length(hierabrite)), function(h){
                 if(length(hierabrite[[h]][["name"]][hierabrite[[h]][["name"]]
                                                     %in% pathselected])>0){
@@ -927,7 +914,6 @@ rshiny=function(listdata){
             }, list(1))
             v$selec_pathtype<-rm_vector(unname(unlist(v$selec_pathtype)))
             #types d'interactions, types genes et go
-            cat("hm_elements : ", hm_elements, "\n")
             v$selec_genetype<-lapply(hierapath, function(h){
                 if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
                     hm_genes<-hm_elements[hm_elements %in%
