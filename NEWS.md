@@ -1,5 +1,15 @@
 # *News*
 
+# Changes in version 0.99.2 (2020-10-01)
+
+* Changed loops by apply functions
+* Updated datasets documentation
+* Updated DESCRIPTION file
+
+# Changes in version 0.99.1 (2020-10-01)
+
+* Fixed testthat issues
+
 # Changes in version 0.99.0 (2020-09-24)
 
 * Updated version for Bioconductor submission

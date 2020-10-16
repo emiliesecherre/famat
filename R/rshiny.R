@@ -61,7 +61,8 @@ ui<-function(types, genetype, gotermsgene){
                                 shiny::fluidRow(
                                     shiny::column(8, align="center", offset=0,
                                         shiny::radioButtons("mode", "Mode :",
-                                        choices=c("a AND b","a OR b","a NOT b"),
+                                        choices=c("a AND b","a OR b",
+                                                    "a NOT b"),
                                         selected="a AND b", inline=TRUE)),
                                     shiny::column(4, align="center", offset=0,
                                         shiny::actionButton("elemfilters",
@@ -244,7 +245,7 @@ rshiny=function(listdata){
                                         v$heatmap_shiny))))[v$x1_selected_rows]
             v$x1_selected_rows<-v$heatmap_shiny[v$x1_selected_rows, 1]
             if(v$x1_selected_rows!=""){
-                sd <- which(heatmap$un %in% v$x1_selected_rows)
+                sd <- which(heatmap[,1] %in% v$x1_selected_rows)
                 popgene<-genetab[genetab[, 1] %in%rm_vector(
                             colnames(heatmap[sd, ])[which(heatmap[sd, ] == 1,
                                                 arr.ind = TRUE)[, "col"]]), ]
@@ -411,12 +412,12 @@ rshiny=function(listdata){
             v$intetab_shiny<-intetab[intetab[, 1] %in% selected_inter, ]
 
             #histo
+            cat("v$histo_tab et v$history \n")
+            print(v$histo_tab)
             if(length(v$history) == 10){
                 v$history<-v$history[-1]
-                for(d in seq_len(nrow(v$histo_tab)-1)){
-                    v$histo_tab[d, 1]<-v$histo_tab[d+1, 1]
-                }
-                v$histo_tab<-v$histo_tab[-10, ]
+                v$histo_tab=as.data.frame(v$histo_tab[-1,])
+                names(v$histo_tab)="histo"
             }
 
             v$history[[length(v$history)+1]]<-list(path=v$heatmap_shiny,
@@ -430,77 +431,124 @@ rshiny=function(listdata){
 
             #update available choices on filters
             hm_elements<-names(v$heatmap_shiny)
-            v$selec_pathtype<-v$selec_genetype<-vector()
-            v$selecgo<-v$selec_inter<-vector()
 
             pathselected<-v$heatmap_shiny[row.names(v$heatmap_shiny), 2]
-            for(h in seq_len(length(hierabrite))){ #path
+            cat("pathselected : ", pathselected, "\n")
+            v$selec_pathtype<-vapply(seq_len(length(hierabrite)), function(h){
                 if(length(hierabrite[[h]][["name"]][hierabrite[[h]][["name"]]
-                                                        %in% pathselected])>0){
-                    v$selec_pathtype<-rm_vector(c(v$selec_pathtype,
-                                                        names(hierabrite)[h]))
+                                                    %in% pathselected])>0){
+                    list(names(hierabrite)[h])
                 }
-            }
-            gomfid<-vector()
-            gobpid<-vector()
+                else{list(NULL)}
+            }, list(1))
+            v$selec_pathtype<-rm_vector(unname(unlist(v$selec_pathtype)))
+            cat("hm_elements : ", hm_elements, "\n")
             #types d'interactions, types genes et go
-            for(i in seq_len(length(hierapath))){
-                if(length(hierapath[[i]][["name"]][hierapath[[i]][["name"]]
-                                                        %in% pathselected])>0){
+            v$selec_genetype<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
                     hm_genes<-hm_elements[hm_elements %in%
-                            hierapath[[i]][["elem"]][hierapath[[i]][["elem"]]
-                                                                %in% genes]]
-                    hm_inter<-hm_elements[hm_elements %in%
-                            hierapath[[i]][["elem"]][hierapath[[i]][["elem"]]
-                                                            %in% intetab[, 1]]]
-
+                                        h[["elem"]][h[["elem"]] %in% genes]]
                     if(length(hm_genes)>0){
-                        for(g in seq_len(length(genetype))){
+                        gene_toadd<-vapply(seq_len(length(genetype)),
+                                                                function(g){
                             if(length(genetype[[g]][genetype[[g]] %in%
-                                                                hm_genes])>0){
-                                v$selec_genetype<-rm_vector(c(v$selec_genetype,
-                                                        names(genetype)[g]))
+                                                    hm_genes])>0){
+                                list(names(genetype)[g])
+                            }
+                            else{list(NULL)}
+                        }, list(1))
+                        unname(unlist(gene_toadd))
+                    }
+                }
+            })
+            v$selec_genetype<-rm_vector(unname(unlist(v$selec_genetype)))
+
+            v$selecgo<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
+                    hm_genes<-hm_elements[hm_elements
+                                    %in% h[["elem"]][h[["elem"]] %in% genes]]
+                    if(length(hm_genes)>0){
+                        if(length(hm_genes[hm_genes %in%
+                                            go_genelist$hgnc_symbol])>0){
+                            goenr<-go_genelist[go_genelist$hgnc_symbol %in%
+                                                hm_genes[hm_genes %in%
+                                                go_genelist$hgnc_symbol], 2]
+                            if(length(goenr %in% allResBP[, 1])>0){
+                                allResBP[allResBP[, 1] %in% goenr, 2]
+                            }
+                            else if(length(goenr %in% allResMF[, 1])>0){
+                                allResMF[allResMF[, 1] %in% goenr, 2]
                             }
                         }
+                    }
+                }
+            })
+            v$selecgo<-rm_vector(unname(unlist(v$selecgo)))
+
+            v$selec_inter<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
+                    hm_inter<-hm_elements[hm_elements
+                                %in% h[["elem"]][h[["elem"]] %in% intetab[,1]]]
+                    if (length(hm_inter)>0){
+                        intetab[intetab[, 1] %in% hm_inter, 7]
+                    }
+                }
+            })
+            v$selec_inter<-rm_vector(unname(unlist(v$selec_inter)))
+
+            gobpid<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
+                    hm_genes<-hm_elements[hm_elements %in%
+                                            h[["elem"]][h[["elem"]] %in% genes]]
+
+                    if(length(hm_genes)>0){
                         if(length(hm_genes[hm_genes %in%
-                                                go_genelist$hgnc_symbol] )>0){
+                                            go_genelist$hgnc_symbol] )>0){
+                            goenr<-go_genelist[go_genelist$hgnc_symbol %in%
+                                                hm_genes[hm_genes %in%
+                                                go_genelist$hgnc_symbol],2]
+                            if(length(goenr[goenr %in% allResBP[, 1]])>0){
+                                goenrbp<-goenr[goenr %in% allResBP[, 1]]
+                                toadd_bp<-lapply(gobplist, function(g){
+                                    if (length(g[["goterm"]][g[["goterm"]]
+                                                            %in% goenrbp])>0){
+                                        g[["index"]]
+                                    }
+                                })
+                                toadd_bp<-unname(unlist(toadd_bp))
+                            }
+                        }
+                    }
+                }
+            })
+            gobpid=unname(unlist(gobpid))
+
+            gomfid<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
+                    hm_genes<-hm_elements[hm_elements %in%
+                                        h[["elem"]][h[["elem"]] %in% genes]]
+
+                    if(length(hm_genes)>0){
+                        if(length(hm_genes[hm_genes %in%
+                                            go_genelist$hgnc_symbol] )>0){
                             goenr<-go_genelist[go_genelist$hgnc_symbol %in%
                                                     hm_genes[hm_genes %in%
                                                     go_genelist$hgnc_symbol],2]
-                            if(length(goenr[goenr %in% allResBP[, 1]])>0){
-                                goenrbp<-goenr[goenr %in% allResBP[, 1]]
-                                for(b in seq_len(length(gobplist))){
-                                    if (length(gobplist[[b]][["goterm"]]
-                                                [gobplist[[b]][["goterm"]]
-                                                            %in% goenrbp])>0){
-                                        gobpid<-c(gobpid,
-                                                    gobplist[[b]][["index"]])
-                                    }
-                                }
-                                v$selecgo<-rm_vector(c(v$selecgo,
-                                        allResBP[allResBP[,1] %in% goenrbp,2]))
-                            }
-                            else if(length(goenr[goenr %in% allResMF[, 1]])>0){
+                            if(length(goenr[goenr %in% allResMF[, 1]])>0){
                                 goenrmf<-goenr[goenr %in% allResMF[, 1]]
-                                for(m in seq_len(length(gomflist))){
-                                    if (length(gomflist[[m]][["goterm"]][
-                                                    gomflist[[m]][["goterm"]]
+                                toadd_mf<-lapply(gomflist, function(g){
+                                    if (length(g[["goterm"]][g[["goterm"]]
                                                             %in% goenrmf])>0){
-                                        gomfid<-c(gomfid,
-                                                    gomflist[[m]][["index"]] )
+                                        g[["index"]]
                                     }
-                                }
-                                v$selecgo<-rm_vector(c(v$selecgo,
-                                    allResMF[allResMF[, 1] %in% goenrmf, 2]))
+                                })
+                                toadd_mf<-unname(unlist(toadd_mf))
                             }
                         }
                     }
-                    if (length(hm_inter)>0){
-                        v$selec_inter<-rm_vector(c(v$selec_inter,
-                                    intetab[intetab[, 1] %in% hm_inter, 6]))
-                    }
                 }
-            }
+            })
+            gomfid=unname(unlist(gomfid))
             gomfid<-gomfid[gomfid %in% as.integer(row.names(v$gomf))]
             gobpid<-gobpid[gobpid %in% as.integer(row.names(v$gobp))]
             v$gomf<-v$gomf[as.character(gomfid), ]
@@ -537,16 +585,15 @@ rshiny=function(listdata){
                                                                 selected="all")
                 selected<-"all"
             }
+            cat("input$intetype : ", input$intetype, "\n")
             if(!("all" %in% selected)){
-                v$select_intertype<-vector()
                 selected_inter<-rm_vector(intetab[intetab[,7] %in% selected,4])
-                for (h in seq_len(length(hierapath))){
-                    if(length(hierapath[[h]][["elem"]][hierapath[[h]][["elem"]]
-                                                    %in% selected_inter])>0){
-                        v$select_intertype<-c(v$select_intertype,
-                                                    hierapath[[h]][["index"]])
+                v$select_intertype<-lapply(hierapath, function(h){
+                    if(length(h[["elem"]][h[["elem"]] %in% selected_inter])>0){
+                        h[["index"]]
                     }
-                }
+                })
+                v$select_intertype=unname(unlist(v$select_intertype))
             }
             else{
                 v$select_intertype<-vector()
@@ -562,11 +609,10 @@ rshiny=function(listdata){
                 selected="all"
             }
             if(!("all" %in% selected)){
-                v$column<-vector()
-                for (s in seq_len(length(selected))){
-                    v$column<-c(v$column, genetype[[selected[s]]])
-                }
-                v$column<-rm_vector(v$column)
+                v$column<-vapply(selected, function(s){
+                    list(genetype[[s]])
+                }, list(1))
+                v$column<-rm_vector(unname(unlist(v$column)))
             }
             else{
                 v$column<-vector()
@@ -602,7 +648,7 @@ rshiny=function(listdata){
                 while(a<=length(v$walk)){
                     if(a == 1){
                         prev_elem_path<-rm_vector(as.vector(v$heatmap_shiny[
-                            v$heatmap_shiny[, v$walk[a]] %in% c(1), "deux"]))
+                            v$heatmap_shiny[, v$walk[a]] %in% c(1), 2]))
                         if(length(v$walk) == 1){
                             elem_path<-prev_elem_path
                         }
@@ -611,7 +657,7 @@ rshiny=function(listdata){
 
                     else if(length(v$walk)!=1){
                         elem_path<-rm_vector(as.vector(v$heatmap_shiny[
-                            v$heatmap_shiny[, v$walk[a+1]] %in% c(1), "deux"]))
+                            v$heatmap_shiny[, v$walk[a+1]] %in% c(1), 2]))
                         if(v$walk[a] == "&"){
                             elem_path<-intersect(elem_path, prev_elem_path)
                         }
@@ -628,20 +674,29 @@ rshiny=function(listdata){
 
                 #use pathways to find which hierarchies to show,
                 #and which elements
-                index<-vector()
-                hm_elements<-vector()
-                for (b in seq_len(length(hierapath))){
+                index<-lapply(hierapath, function(h){
                     if(length(which(names(table(elem_path %in%
-                                    hierapath[[b]][["name"]])) == TRUE))>0){
-                        hiera_elements<-hierapath[[b]][["elem"]]
+                                                h[["name"]])) == TRUE))>0){
+                        hiera_elements<-h[["elem"]]
                         if(length(hiera_elements[hiera_elements %in%
-                                                        v$a_not_b]) == 0){
-                            hm_elements<-c(hm_elements,
-                                                    hierapath[[b]][["elem"]])
-                            index<-c(index, hierapath[[b]][["index"]])
+                                                v$a_not_b]) == 0){
+                            h[["index"]]
                         }
                     }
-                }
+                })
+                index<-unname(unlist(index))
+
+                hm_elements<-lapply(hierapath, function(h){
+                    if(length(which(names(table(elem_path %in%
+                                                h[["name"]])) == TRUE))>0){
+                        hiera_elements<-h[["elem"]]
+                        if(length(hiera_elements[hiera_elements %in%
+                                                v$a_not_b]) == 0){
+                            h[["elem"]]
+                        }
+                    }
+                })
+                hm_elements<-unname(unlist(hm_elements))
                 index<-sort(index)
                 hm_elements<-rm_vector(hm_elements)
 
@@ -660,14 +715,18 @@ rshiny=function(listdata){
                 #GOTERMS
                 genes_in_walk<-v$walk[v$walk %in% genes]
                 walk_only_genes<-vector()
+                cat("genes_in_walk : ", genes_in_walk, "\n")
+                cat("v$walk : ", v$walk, "\n")
                 if (length(genes_in_walk)>0){
                     wi<-which(v$walk %in% genes_in_walk)
                     walk_only_genes<-c(walk_only_genes, v$walk[wi[1]])
-                    if (length(wi)>1){
-                        for (w in 2:length(wi)){
-                            walk_only_genes<-c(walk_only_genes,
-                                            v$walk[wi[w]-1], v$walk[wi[w]])
-                        }
+                    wi<-wi[-1]
+                    if (length(wi)>0){
+                        toadd<-vapply(wi, function(w){
+                            list(c(v$walk[wi[w]-1], v$walk[wi[w]]))
+                        }, list(1))
+                        walk_only_genes<-c(walk_only_genes,
+                                            unname(unlist(toadd)))
                     }
 
                     g<-1
@@ -713,35 +772,36 @@ rshiny=function(listdata){
                         }
                     }
 
-                    hiera_gomf<-vector()
-                    for (m in seq_len(length(gomflist))){
+                    cat("prev_walk_gomf : ", prev_walk_gomf, "\n")
+                    cat("v$a_not_b : ", v$a_not_b, "\n")
+                    hiera_gomf<-lapply(gomflist, function(g){
                         if(length(which(names(table(prev_walk_gomf %in%
-                                    gomflist[[m]][["goterm"]])) == TRUE))>0){
-                            hierago_gene<-gomflist[[m]][["gene"]]
+                                                g[["goterm"]])) == TRUE))>0){
+                            hierago_gene<-g[["gene"]]
                             if(length(hierago_gene[hierago_gene %in%
-                                                            v$a_not_b]) == 0){
-                                hiera_gomf<-c(hiera_gomf,
-                                                    gomflist[[m]][["index"]])
+                                                v$a_not_b]) == 0){
+                                g[["index"]]
                             }
                         }
-                    }
+                    })
+                    hiera_gomf<-unname(unlist(hiera_gomf))
                     hiera_gomf<-sort(hiera_gomf)
                     hiera_gomf<-hiera_gomf[hiera_gomf %in%
                                                 as.integer(row.names(v$gomf))]
                     v$gomf<-v$gomf[as.character(hiera_gomf), ]
 
-                    hiera_gobp<-vector()
-                    for (b in seq_len(length(gobplist))){
+                    cat("prev_walk_gobp : ", prev_walk_gobp, "\n")
+                    hiera_gobp<-lapply(gobplist, function(g){
                         if(length(which(names(table(prev_walk_gobp %in%
-                                    gobplist[[b]][["goterm"]])) == TRUE))>0){
-                            hierago_gene<-gobplist[[b]][["gene"]]
+                                                g[["goterm"]])) == TRUE))>0){
+                            hierago_gene<-g[["gene"]]
                             if(length(hierago_gene[hierago_gene %in%
-                                                            v$a_not_b]) == 0){
-                                hiera_gobp<-c(hiera_gobp,
-                                                    gobplist[[b]][["index"]])
+                                                v$a_not_b]) == 0){
+                                g[["index"]]
                             }
                         }
-                    }
+                    })
+                    hiera_gobp<-unname(unlist(hiera_gobp))
                     hiera_gobp<-sort(hiera_gobp)
                     hiera_gobp<-hiera_gobp[hiera_gobp %in%
                                                 as.integer(row.names(v$gobp))]
@@ -753,20 +813,29 @@ rshiny=function(listdata){
                 elem_path<-rm_vector(v$heatmap_shiny[!(v$heatmap_shiny[, 2]
                                                                 %in% c(0)), 2])
 
-                index<-vector()
-                hm_elements<-vector()
-                for (b in seq_len(length(hierapath))){
+                index<-lapply(hierapath, function(h){
                     if(length(which(names(table(elem_path %in%
-                                    hierapath[[b]][["name"]])) == TRUE))>0){
-                        hiera_elements<-hierapath[[b]][["elem"]]
+                                                h[["name"]])) == TRUE))>0){
+                        hiera_elements<-h[["elem"]]
                         if(length(hiera_elements[hiera_elements %in%
-                                                        v$a_not_b]) == 0){
-                            hm_elements<-c(hm_elements,
-                                                    hierapath[[b]][["elem"]])
-                            index<-c(index, hierapath[[b]][["index"]])
+                                                v$a_not_b]) == 0){
+                            h[["index"]]
                         }
                     }
-                }
+                })
+                index<-unname(unlist(index))
+
+                hm_elements<-lapply(hierapath, function(h){
+                    if(length(which(names(table(elem_path %in%
+                                                h[["name"]])) == TRUE))>0){
+                        hiera_elements<-h[["elem"]]
+                        if(length(hiera_elements[hiera_elements %in%
+                                                v$a_not_b]) == 0){
+                            h[["elem"]]
+                        }
+                    }
+                })
+                hm_elements<-unname(unlist(hm_elements))
                 index<-sort(index)
                 hm_elements<-rm_vector(hm_elements)
 
@@ -778,36 +847,37 @@ rshiny=function(listdata){
                 prev_walk_gomf<-allResMF[, 1]
                 prev_walk_gobp<-allResBP[, 1]
 
-                hiera_gomf<-vector()
-                for (m in seq_len(length(gomflist))){
+                hiera_gomf<-lapply(gomflist, function(g){
                     if(length(which(names(table(prev_walk_gomf %in%
-                                    gomflist[[m]][["goterm"]])) == TRUE))>0){
-                        hierago_gene<-gomflist[[m]][["gene"]]
+                                                g[["goterm"]])) == TRUE))>0){
+                        hierago_gene<-g[["gene"]]
                         if(length(hierago_gene[hierago_gene %in%
-                                                            v$a_not_b]) == 0){
-                            hiera_gomf<-c(hiera_gomf, gomflist[[m]][["index"]])
+                                                v$a_not_b]) == 0){
+                            g[["index"]]
                         }
                     }
-                }
+                })
+                hiera_gomf<-unname(unlist(hiera_gomf))
                 hiera_gomf<-sort(hiera_gomf)
                 hiera_gomf<-hiera_gomf[hiera_gomf %in%
-                                                as.integer(row.names(v$gomf))]
+                                            as.integer(row.names(v$gomf))]
                 v$gomf<-v$gomf[as.character(hiera_gomf), ]
 
-                hiera_gobp<-vector()
-                for (b in seq_len(length(gobplist))){
+                cat("prev_walk_gobp : ", prev_walk_gobp, "\n")
+                hiera_gobp<-lapply(gobplist, function(g){
                     if(length(which(names(table(prev_walk_gobp %in%
-                                    gobplist[[b]][["goterm"]])) == TRUE))>0){
-                        hierago_gene<-gobplist[[b]][["gene"]]
-                        if(length(hierago_gene[hierago_gene %in% v$a_not_b])
-                                                                        == 0){
-                            hiera_gobp<-c(hiera_gobp, gobplist[[b]][["index"]])
+                                                g[["goterm"]])) == TRUE))>0){
+                        hierago_gene<-g[["gene"]]
+                        if(length(hierago_gene[hierago_gene %in%
+                                                v$a_not_b]) == 0){
+                            g[["index"]]
                         }
                     }
-                }
+                })
+                hiera_gobp<-unname(unlist(hiera_gobp))
                 hiera_gobp<-sort(hiera_gobp)
                 hiera_gobp<-hiera_gobp[hiera_gobp %in%
-                                                as.integer(row.names(v$gobp))]
+                                            as.integer(row.names(v$gobp))]
                 v$gobp<-v$gobp[as.character(hiera_gobp), ]
             }
 
@@ -826,12 +896,11 @@ rshiny=function(listdata){
             v$intetab_shiny<-intetab[intetab[, 1] %in% selected_inter, ]
 
             #histo
+            cat("v$history : ", v$history, "\n")
             if(length(v$history) == 10){
                 v$history<-v$history[-1]
-                for(d in seq_len(nrow(v$histo_tab)-1)){
-                    v$histo_tab[d, 1]<-v$histo_tab[d+1, 1]
-                }
-                v$histo_tab<-v$histo_tab[-10, ]
+                v$histo_tab=as.data.frame(v$histo_tab[-1,])
+                names(v$histo_tab)="histo"
             }
 
             v$history[[length(v$history)+1]]<-list(path=v$heatmap_shiny,
@@ -844,60 +913,73 @@ rshiny=function(listdata){
 
             #update available choices on filters
             hm_elements<-names(v$heatmap_shiny)
-            v$selec_pathtype<-v$selec_genetype<-vector()
+            v$selec_genetype<-vector()
             v$selecgo<-v$selec_inter<-vector()
 
             pathselected<-v$heatmap_shiny[row.names(v$heatmap_shiny), 2]
-            for(h in seq_len(length(hierabrite))){ #path
+            cat("pathselected : ", pathselected, "\n")
+            v$selec_pathtype<-vapply(seq_len(length(hierabrite)), function(h){
                 if(length(hierabrite[[h]][["name"]][hierabrite[[h]][["name"]]
-                                                        %in% pathselected])>0){
-                    v$selec_pathtype<-rm_vector(c(v$selec_pathtype,
-                                                        names(hierabrite)[h]))
+                                                    %in% pathselected])>0){
+                    list(names(hierabrite)[h])
                 }
-            }
+                else{list(NULL)}
+            }, list(1))
+            v$selec_pathtype<-rm_vector(unname(unlist(v$selec_pathtype)))
             #types d'interactions, types genes et go
-            for(i in seq_len(length(hierapath))){
-                if(length(hierapath[[i]][["name"]][hierapath[[i]][["name"]]
-                                                        %in% pathselected])>0){
+            cat("hm_elements : ", hm_elements, "\n")
+            v$selec_genetype<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
                     hm_genes<-hm_elements[hm_elements %in%
-                            hierapath[[i]][["elem"]][hierapath[[i]][["elem"]]
-                                                                %in% genes]]
-                    hm_inter<-hm_elements[hm_elements %in%
-                            hierapath[[i]][["elem"]][hierapath[[i]][["elem"]]
-                                                        %in% intetab[, 1]]]
+                                        h[["elem"]][h[["elem"]] %in% genes]]
 
                     if(length(hm_genes)>0){
-                        for(g in seq_len(length(genetype))){
+                        gene_toadd<-vapply(seq_len(length(genetype)),
+                                                                function(g){
                             if(length(genetype[[g]][genetype[[g]] %in%
-                                                                hm_genes])>0){
-                                v$selec_genetype<-rm_vector(c(v$selec_genetype,
-                                                        names(genetype)[g]))
+                                                    hm_genes])>0){
+                                list(names(genetype)[g])
                             }
-                        }
+                            else{list(NULL)}
+                        }, list(1))
+                        unname(unlist(gene_toadd))
+                    }
+                }
+            })
+            v$selec_genetype<-rm_vector(unname(unlist(v$selec_genetype)))
+
+            v$selecgo<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
+                    hm_genes<-hm_elements[hm_elements %in%
+                                        h[["elem"]][h[["elem"]] %in% genes]]
+                    if(length(hm_genes)>0){
                         if(length(hm_genes[hm_genes %in%
-                                                go_genelist$hgnc_symbol])>0){
+                                            go_genelist$hgnc_symbol])>0){
                             goenr<-go_genelist[go_genelist$hgnc_symbol %in%
                                                 hm_genes[hm_genes %in%
                                                 go_genelist$hgnc_symbol], 2]
                             if(length(goenr %in% allResBP[, 1])>0){
-                                v$selecgo<-rm_vector(c(v$selecgo,
-                                                allResBP[allResBP[, 1] %in%
-                                                                goenr, 2]))
+                                allResBP[allResBP[, 1] %in% goenr, 2]
                             }
                             else if(length(goenr %in% allResMF[, 1])>0){
-                                v$selecgo<-rm_vector(c(v$selecgo,
-                                                allResMF[allResMF[, 1] %in%
-                                                                goenr, 2]))
+                                allResMF[allResMF[, 1] %in% goenr, 2]
                             }
                         }
                     }
+                }
+            })
+            v$selecgo<-rm_vector(unname(unlist(v$selecgo)))
+
+            v$selec_inter<-lapply(hierapath, function(h){
+                if(length(h[["name"]][h[["name"]] %in% pathselected])>0){
+                    hm_inter<-hm_elements[hm_elements %in%
+                                    h[["elem"]][h[["elem"]] %in% intetab[,1]]]
                     if (length(hm_inter)>0){
-                        v$selec_inter<-rm_vector(c(v$selec_inter,
-                                                    intetab[intetab[, 1] %in%
-                                                                hm_inter, 6]))
+                        intetab[intetab[, 1] %in% hm_inter, 6]
                     }
                 }
-            }
+            })
+            v$selec_inter<-rm_vector(unname(unlist(v$selec_inter)))
 
             shiny::updateSelectInput(session, "gotype", "Enriched GO terms : ",
                                 choices = c("all", v$selecgo), selected="all")
@@ -998,7 +1080,7 @@ rshiny=function(listdata){
             input$reset
             input$view
 
-            y<-rev(v$heatmap_shiny$un)
+            y<-rev(v$heatmap_shiny[,1])
             if(length(y)>0){
                 tempor<-data.matrix(v$heatmap_shiny[,
                                     which(colnames(v$heatmap_shiny) %in%

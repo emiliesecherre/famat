@@ -2,27 +2,48 @@
 \alias{listw}
 \docType{data}
 \title{
-    Output of \code{path_enrich} function for WIKIPATHWAYS pathways
+    Pathway enrichment analysis results for Wikipathways pathways.
 }
 \description{
     Results of pathways enrichment analysis on the list of genes and
-    metabolites, using WIKIPATHWAYS pathways. Pathways enrichment analysis
+    metabolites, using Wikipathways pathways. Pathways enrichment analysis
     is performed using MPINet for metabolites and gprofiler2 for genes.
 }
 \usage{data("listw")}
 \format{
     A list of 4 items.
     \describe{
-        \item{\code{resmeta}}{
-            Results of metabolites pathway enrichment analysis
+        \item{resmeta}{
+            Pathway enrichment analysis results for metabolites.
+            A data frame with 48 rows and 2 variables.
+            \describe{
+                \item{name}{
+                    Name of pathways resulting in metabolites pathway
+                    enrichment analysis.
+                }
+                \item{id}{
+                    Identifiers of pathways resulting in metabolites
+                    pathway enrichment analysis.
+                }
+            }
         }
-        \item{\code{resgene}}{Results of genes pathway enrichment analysis}
-        \item{\code{gened}}{Vector containing genes}
-        \item{\code{metad}}{Vector containing metabolites}
+        \item{resgene}{
+            Pathway enrichment analysis results for genes.
+            A data frame with 8 rows and 2 variables.
+            \describe{
+                \item{name}{
+                    Name of pathways resulting in genes pathway
+                    enrichment analysis.
+                }
+                \item{id}{
+                    Identifiers of pathways resulting in genes
+                    pathway enrichment analysis.
+                }
+            }
+        }
+        \item{gened}{Vector containing user's genes (ACAA1, SLC6A12)}
+        \item{metad}{Vector containing user's metabolites (C00002, C00719)}
     }
-}
-\source{
-    \code{path_enrich} function.
 }
 \references{
     Yanjun Xu, Chunquan Li and Xia Li (2013). MPINet: The package can implement
@@ -32,5 +53,8 @@
     Liis Kolberg and Uku Raudvere (2020). gprofiler2: Interface to the
     'g:Profiler' Toolset. R package version 0.2.0.
     https://CRAN.R-project.org/package=gprofiler2
+}
+\source{
+    \code{path_enrich} function.
 }
 \keyword{datasets}

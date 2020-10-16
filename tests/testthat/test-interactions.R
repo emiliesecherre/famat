@@ -7,7 +7,7 @@ etape_inter=interactions(listk, listr, listw)
 size=etape_inter[[1]];tagged=etape_inter[[3]];central=etape_inter[[6]];no_path=etape_inter[[7]]
 
 test_that("interactions are well extracted", {
-  expect_equal(nrow(size),288)
+  expect_equal(nrow(size),286)
   expect_equal(nrow(tagged),11)
   expect_equal(length(central),138)
   expect_equal(nrow(no_path),1)

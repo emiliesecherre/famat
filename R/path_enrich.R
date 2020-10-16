@@ -17,28 +17,19 @@ meta_path<-function(meta, db){
     meta_pubchem<-mapper[which(mapper[, 1] %in% meta), 2]
 
     ##perform pathway enrichment analysis on user's metabolites list
+    ##extract informations about pathways from MPINet results
     pss<-MPINet::getPSS(meta_pubchem, plot=FALSE)
     if(db == "KEGG"){
         medium<-MPINet::identifypathway(meta_pubchem, pss, "KEGG")
-    }
-    else if(db == "REAC"){
+        resm<-vapply(medium, function(x){x[[2]][[1]]}, character(1))
+    }else if(db == "REAC"){
         medium<-MPINet::identifypathway(meta_pubchem, pss, "Reactome")
-    }
-    else if (db == "WP"){
+        resm<-vapply(medium, function(x){x[[1]][[1]]}, character(1))
+    }else if (db == "WP"){
         medium<-MPINet::identifypathway(meta_pubchem, pss, "Wikipathways")
+        resm<-vapply(medium, function(x){x[[1]][[1]]}, character(1))
     }
 
-    ##extract informations about pathways from MPINet results
-    resm<-vector()
-    for (i in seq_len(length(medium))) {
-        path<-medium[[i]]
-        if(db == "KEGG"){
-            resm[i]<-path[[2]][[1]]
-        }
-        else if (db == "REAC" || db == "WP"){
-            resm[i]<-path[[1]][[1]]
-        }
-    }
     resm=as.data.frame(resm);names(resm)="name"
     return(resm)
 }
@@ -61,31 +52,34 @@ path_enrich<-function(source, metabo, genes){
         names(keggdb)<-nameskegg[!(nameskegg %in% "")]
 
         resgene$id<-paste("hsa:", resgene$id, sep="")
-        for (n in seq_len(nrow(resmeta))){
-            id<-keggdb[[resmeta[n,1]]]
-            if(!is.null(id)){resmeta[n, 2]<-id}
-        }
+        resmeta[,2]=apply(resmeta, 1, function(x){
+            id=keggdb[[x[1]]]
+            if(!is.null(id)){id}
+            else{NA}
+        })
     }
     else if(source == "REAC"){
         readb<-unlist(as.list(reactome.db::reactomePATHID2NAME))
         readb<-readb[which(stringr::str_sub(readb, 1, 14)%in%"Homo sapiens: ")]
         pathids=names(readb);readb<-stringr::str_sub(readb, 15, nchar(readb))
         names(readb)=pathids
-        for (n in seq_len(nrow(resmeta))){
-            id<-names(readb[which(readb %in% resmeta[n, 1])])
-            if (length(id)>0){resmeta[n, 2]<-id}
-        }
+        resmeta[,2]=apply(resmeta, 1, function(x){
+            id=names(readb[which(readb %in% x[1])])
+            if(length(id)>0){id}
+            else{NA}
+        })
     }
     else if (source == "WP"){
         wpdb<-rWikiPathways::listPathways("Homo sapiens")
         wpdb<-wpdb[, c(3, 1)]
-        for (r in seq_len(nrow(resmeta))){
-            pathname=stringr::str_to_upper(resmeta[r, 1])
+        ids=apply(resmeta, 1, function(x){
+            pathname=stringr::str_to_upper(x[1])
             id<-wpdb[which(pathname == stringr::str_to_upper(wpdb$name)), 2]
-            if(length(id)>0){resmeta[r, 2]<-id[1]}
-        }
+            if(length(id)>0){id[1]}
+            else{NA}
+        })
+        resmeta[,2]=unname(unlist(ids))
         resgene$id<-paste("WP", resgene$id, sep="")
     }
     return(list(resmeta, resgene, genes, metabo))
 }
-

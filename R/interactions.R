@@ -29,113 +29,103 @@ get_pathways<-function(resgk, resgr, resgw, resmk, resmr, resmw){
 }
 
 ##function of data_size, fills the dataframe
-elem_size<-function(size, i, j, user_elem, path_elem){
-    size[i, j+2]<-length(user_elem)
+elem_size<-function(user_elem, path_elem){
+    sumary=vector()
     if (length(user_elem)>0){
-        size[i, j+3]<-paste(user_elem, collapse=" # ")
-        size[i, j]<-length(intersect(user_elem, path_elem))
+        sumary=c(sumary,length(intersect(user_elem, path_elem)))
         if (length(intersect(user_elem, path_elem))>0){
             elements=intersect(user_elem, path_elem)
-            size[i, j+1]<-paste(elements, collapse=" # ")
+            sumary=c(sumary,paste(elements, collapse=" # "))
         }
-        else{size[i, j+1]<-NA}
+        else{sumary=c(sumary,NA)}
+        sumary=c(sumary,length(user_elem))
+        sumary=c(sumary,paste(user_elem, collapse=" # "))
+    }else{
+        sumary=c(sumary,0,NA,length(user_elem),NA)
     }
-    else{
-        size[i, j+3]<-NA
-        size[i, j]<-0
-    }
-    return(size)
+    return(sumary)
 }
 
 #dataframe showing pathways and which genes/metabolites they have
 data_size<-function(inter, meta_list, gene_list, mapkegg, pathk, pathr, pathp){
-    size<-data.frame(path=character(), nb_gene_query=integer(),
-                        gene_que=character(), nb_gene_tot=integer(),
-                        genes=character(), nb_meta_query=integer(),
-                        meta_que=character(), nb_meta_tot=integer(),
-                        meta=character())
-
     pathtot_ids<-c(pathk$id, pathr$id, pathp$id)
-    for (k in seq_len(length(pathtot_ids))){
-        path_inter<-inter[which(inter$path == pathtot_ids[k]),]
+    pre_size=lapply(pathtot_ids, function(x){
+        path_inter<-inter[which(inter$path == x),]
         elements<-rm_vector(c(path_inter[, 1], path_inter[, 3]))
-
         meta<-elements[which(elements %in% mapkegg$name)]
         gene<-elements[which(!(elements %in% mapkegg$name))]
 
-        size[k, 1]<-pathtot_ids[k]
-
-        size<-elem_size(size, k, 2, gene, gene_list)
-        size<-elem_size(size, k, 6, meta, meta_list)
-    }
+        c(x,elem_size(gene, gene_list),elem_size(meta, meta_list))
+    })
+    size=data.frame(matrix(unlist(pre_size), nrow=length(pre_size), byrow=TRUE))
+    names(size)=c("path", "nb_gene_query","gene_que", "nb_gene_tot","genes",
+                    "nb_meta_query","meta_que", "nb_meta_tot","meta")
+    size[,c(2,4,6,8)]=apply(size[,c(2,4,6,8)],2,as.integer)
     return(size)
 }
 
 #add direct interactions types to direct interactions dataframe
 interactions_type<-function(inter, meta, genes){
-    inter<-cbind(inter, type=rep(NA, nrow(inter)))
-    for (d in seq_len(nrow(inter))){
+    tags=apply(inter,1,function(x){
         tag<-""
-        if(inter[d, 1] %in% meta && inter[d, 3] %in% meta){
+        if(x[1] %in% meta && x[3] %in% meta){
             tag<-"m/m"
         }
-        else if((inter[d, 1] %in% meta && inter[d, 3] %in% genes) ||
-                (inter[d, 1] %in% genes && inter[d, 3] %in% meta)){
+        else if((x[1] %in% meta && x[3] %in% genes) ||
+                (x[1] %in% genes && x[3] %in% meta)){
             tag<-"g/m"
         }
-        else if (inter[d, 1] %in% genes && inter[d, 3] %in% genes){
+        else if (x[1] %in% genes && x[3] %in% genes){
             tag<-"g/g"
         }
-        inter[d, 5]<-tag
-    }
+        tag
+    })
+    inter<-cbind(inter, type=unname(tags))
     return(inter)
 }
 
 ##for every pathway, determine how many direct interactions an element from
 ##user's list have with others elements in the pathway.
-centrality<-function(interac, list_elem){
-    central<-list()
+centrality_calc<-function(interac, list_elem){
     inter_allpath<-rm_vector(interac[, 4])
-    for(p in seq_len(length(inter_allpath))){
-        path_inter<-interac[interac[, 4] == inter_allpath[p], ]
+    central=vapply(inter_allpath,function(x){
+        path_inter<-interac[interac[, 4] == x, ]
         elements<-rm_vector(c(path_inter[path_inter[, 1] %in% list_elem, 1],
-                            path_inter[path_inter[, 3] %in% list_elem, 3]))
+                                path_inter[path_inter[, 3] %in% list_elem, 3]))
         if (length(elements)>0){
-            for ( e in seq_len(length(elements))){
-                path_elem<-rbind(path_inter[path_inter[, 1] == elements[e], ],
-                            path_inter[path_inter[, 3]==elements[e], ])
-                central[[inter_allpath[p]]][[elements[e]]]<-nrow(path_elem)
-            }
+            pre_central=vapply(elements,function(y){
+                path_elem<-rbind(path_inter[path_inter[, 1] == y, ],
+                                    path_inter[path_inter[, 3]==y, ])
+                list(nrow(path_elem))
+            }, list(1))
+            list(pre_central)
         }
-    }
+    }, list(1))
     return(central)
 }
 
 ##regroup interactions without taking pathways into account
 filter_inter<-function(inter){
-    tagged<-cbind(inter[, c(seq_len(4))], tag=rep(NA, nrow(inter)), inter[, 5])
-    for (d in seq_len(nrow(inter))){
-        tagged[d, 5]<-paste(tagged[d, 1]," / ", tagged[d, 3], sep="")
-    }
+    tags=apply(inter,1,function(x){
+        paste(x[1]," / ", x[3], sep="")
+    })
+    tagged<-cbind(inter[, c(seq_len(4))], tag=unname(tags), inter[, 5])
     tagged<-rm_df(tagged, c(seq_len(5)))
 
     elements<-tagged[,c(1, 3)]
     filtered<-elements[!duplicated(lapply(as.data.frame(t(elements)), sort)),]
-    no_path<-data.frame(from=character(), link=character(), to=character(),
-                        path=character(), tag=character(), type=character())
-    for(t in seq_len(nrow(filtered))){
+    no_path=apply(filtered,1,function(x){
         filtered_rows<-tagged[intersect(
-            rm_vector(c(which(tagged[, 1] %in% filtered[t, 1]),
-                        which(tagged[, 3] %in% filtered[t, 1]))),
-            rm_vector(c(which(tagged[, 1] %in% filtered[t, 2]),
-                        which(tagged[, 3] %in% filtered[t, 2])))), ]
-        no_path[t, 1]<-filtered[t, 1]; no_path[t, 3]<-filtered[t, 2]
-        no_path[t, 2]<-paste(rm_vector(filtered_rows[, 2]), collapse=", ")
-        no_path[t, 4]<-paste(rm_vector(filtered_rows[, 4]), collapse=", ")
-        no_path[t, 5]<-paste(c(filtered[t, 1], " / ",
-                                filtered[t, 2]), collapse="")
-        no_path[t, 6]<-filtered_rows[1, 6]
-    }
+            rm_vector(c(which(tagged[, 1] %in% x[1]),
+                        which(tagged[, 3] %in% x[1]))),
+            rm_vector(c(which(tagged[, 1] %in% x[2]),
+                        which(tagged[, 3] %in% x[2])))), ]
+        c(x[1],paste(rm_vector(filtered_rows[, 2]), collapse=", "),x[2],
+            paste(rm_vector(filtered_rows[, 4]), collapse=", "),
+            paste(c(x[1], " / ", x[2]), collapse=""),filtered_rows[1, 6])
+    })
+    no_path=as.data.frame(t(no_path))
+    names(no_path)=names(tagged)=c("from", "link", "to", "path", "tag", "type")
     no_path<-rm_df(no_path, c(seq_len(4)))
     return(list(tagged, no_path))
 }
@@ -156,9 +146,8 @@ interactions<-function(listk, listr, listw){
                     c(seq_len(2)))
     keggname<-KEGGREST::keggList("compound")
     keggname<-data.frame(kegg=names(keggname), name=keggname)
-    for (t in seq_len(nrow(keggname))){
-        keggname[t, 2]<-stringr::str_split(keggname[t, 2], ";")[[1]][1]
-    }
+    name=apply(keggname,1,function(x){stringr::str_split(x[2], ";")[[1]][1]})
+    keggname[,2]=unname(name)
     keggchebiname<-merge(keggchebi, keggname, by="kegg")
     keggchebiname$chebi<-stringr::str_to_upper(keggchebiname$chebi)
     keggchebiname<-keggchebiname[which(!is.na(keggchebiname[,1])), ]
@@ -176,7 +165,7 @@ interactions<-function(listk, listr, listw){
     list_elem<-c(meta, genes)
     interac<-rm_df(rbind(interac[which(interac[, 1] %in% list_elem), ],
                         interac[which(interac[, 3] %in% list_elem), ]))
-    central<-centrality(interac, list_elem)
+    central<-centrality_calc(interac, list_elem)
     interac<-interac[intersect(which(interac[, 1] %in% list_elem),
                                 which(interac[, 3] %in% list_elem)), ]
     interac<-interactions_type(interac, meta, genes)

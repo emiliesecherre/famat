@@ -14,41 +14,167 @@
 \format{
     List of 10 items.
     \describe{
-        \item{\code{size}}{
-            Dataframe containing pathways, genes and metabolites in pathways
-            (from the list or not), and number of elements in pathways
+        \item{size}{
+            Description on which elements (from user's list or not) are
+            contained in pathways from pathway enrichment analysis.
+            A data frame with 286 rows and 9 variables.
+            \describe{
+                \item{path}{
+                    Pathways obtained throught pathways enrichment analysis on
+                    KEgg, Reactome and Wikipathways pathways.
+                }
+                \item{nb_gene_query}{
+                    Number of user's genes contained in the pathway (0--2).
+                }
+                \item{gene_que}{
+                    User's genes contained in the pathway
+                    (ACAA1, SLC6A12, ACAA1 # SLC6A12).
+                }
+                \item{nb_gene_tot}{
+                    Total number of genes contained in the pathway
+                    (0--2075).
+                }
+                \item{genes}{
+                    All the genes contained in the pathway.
+                }
+                \item{nb_meta_query}{
+                    Number of user's metabolites contained in the pathway
+                    (0--2).
+                }
+                \item{meta_que}{
+                    User's metabolites contained in the pathway
+                    (Betaine, ATP, Betaine # ATP, ATP # Betaine).
+                }
+                \item{nb_meta_tot}{
+                    Total number of metabolites contained in the pathway
+                    (0--915).
+                }
+                \item{meta}{
+                    All the metabolites contained in the pathway.
+                }
+            }
         }
-        \item{\code{pathtot}}{
-            Dataframe containing pathways names and ids from pathway enrichment
-            analysis on Reactome, Kegg and Wikipathways pathways
+        \item{pathtot}{
+            All results of pathways enrichment analysis performed on Kegg,
+            Reactome and Wikipathways pathways.
+            A data frame with 286 rows and 2 variables.
+            \describe{
+                \item{name}{
+                    Name of pathways resulting in genes pathway
+                    enrichment analysis performed on Kegg, Reactome
+                    and Wikipathways.
+                }
+                \item{id}{
+                    Identifiers of pathways resulting in genes pathway
+                    enrichment analysis performed on Kegg, Reactome
+                    and Wikipathways.
+                }
+            }
         }
-        \item{\code{tagged}}{
-            Dataframe containing direct interactions between elements from the
-            user's list per pathways
+        \item{tagged}{
+            Description of all direct interactions between user's elements in
+            pathways.
+            A data frame with 11 rows and 6 variables.
+            \describe{
+                \item{from}{
+                    First element of the direct interaction (Betaine, SLC6A12)
+                }
+                \item{link}{
+                    Description of how the two elements interact
+                    (Control(In: ACTIVATION of BiochemicalReaction),
+                    controls-transport-of-chemical).
+                }
+                \item{to}{
+                    Second element of the direct interaction (Betaine, SLC6A12)
+                }
+                \item{path}{
+                    Pathway containing the direct interaction (R-HSA-112310,
+                    R-HSA-112315, R-HSA-112316, R-HSA-382551, R-HSA-425366,
+                    R-HSA-425393, R-HSA-425407, R-HSA-888590, R-HSA-352230,
+                    R-HSA-442660, R-HSA-888593)
+                }
+                \item{tag}{
+                    Summary of elements concerned by the interaction
+                    (Betaine / SLC6A12, SLC6A12 / Betaine)
+                }
+                \item{type}{
+                    Interaction type, can be gene/gene, metabolite/metabolite,
+                    or gene/metabolite (g/m)
+                }
+            }
         }
-        \item{\code{namegeneid}}{
-            Dataframe containing all human genes symbols and names
+        \item{namegeneid}{
+            Dataframe containing all human genes symbols and names.
+            A data frame with 39946 rows and 2 variables.
+            \describe{
+                \item{hgnc_symbol}{
+                    Gene symbols of all human genes.
+                }
+                \item{entregene_description}{
+                    Names of all human genes.
+                }
+            }
         }
-        \item{\code{keggchebiname}}{
+        \item{keggchebiname}{
             Dataframe containing all human metabolites ids (kegg and chebi)
-            and names
+            and names.
+            A data frame with 16075 rows and 3 variables.
+            \describe{
+                \item{kegg}{
+                    Kegg_compound identifiers of all human metabolites.
+                }
+                \item{chebi}{
+                    Chebi identifiers of all human metabolites.
+                }
+                \item{name}{
+                    Names of all human metabolites.
+                }
+            }
         }
-        \item{\code{central}}{
+        \item{central}{
             List of pathways, each pathway containing the number of direct
             interactions between an element of user's list and other elements
-            in the pathway
+            in the pathway.
+            A list of 138 items.
         }
-        \item{\code{no_path}}{
+        \item{no_path}{
             Dataframe containing direct interactions between elements from the
-            user's list, but not per pathways
+            user's list, but not per pathways.
+            A data frame with 1 rows and 6 variables.
+            \describe{
+                \item{from}{
+                    First element of the direct interaction (Betaine, SLC6A12)
+                }
+                \item{link}{
+                    Description of how the two elements interact
+                    (Control(In: ACTIVATION of BiochemicalReaction),
+                    controls-transport-of-chemical).
+                }
+                \item{to}{
+                    Second element of the direct interaction (Betaine, SLC6A12)
+                }
+                \item{path}{
+                    Pathways containing the direct interaction ("R-HSA-112310,
+                    R-HSA-112315, R-HSA-112316, R-HSA-382551, R-HSA-425366,
+                    R-HSA-425393, R-HSA-425407, R-HSA-888590, R-HSA-352230,
+                    R-HSA-442660, R-HSA-888593")
+                }
+                \item{tag}{
+                    Summary of elements concerned by the interaction
+                    (Betaine / SLC6A12)
+                }
+                \item{type}{
+                    Interaction type, can be gene/gene, metabolite/metabolite,
+                    or gene/metabolite (g/m)
+                }
+            }
         }
-        \item{\code{genes}}{User's genes given in \code{path_enrich} function}
-        \item{\code{meta}}{
-            User's metabolites given in \code{path_enrich} function
-        }
+        \item{genes}{Vector containing user's genes (ACAA1, SLC6A12)}
+        \item{meta}{Vector containing user's metabolites (C00002, C00719)}
         \item{\code{ensembl}}{
             Result of useMart("ensembl", dataset="hsapiens_gene_ensembl")
-            function of BiomaRt
+            function of BiomaRt.
+            An S4 object of class Mart.
         }
     }
 }

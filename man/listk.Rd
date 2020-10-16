@@ -2,7 +2,7 @@
 \alias{listk}
 \docType{data}
 \title{
-    Output of \code{path_enrich} function for KEGG pathways
+    Pathway enrichment analysis results for KEGG pathways.
 }
 \description{
     Results of pathways enrichment analysis on the list of genes and
@@ -13,12 +13,36 @@
 \format{
     A list of 4 items.
     \describe{
-        \item{\code{resmeta}}{
-            Results of metabolites pathway enrichment analysis
+        \item{resmeta}{
+            Pathway enrichment analysis results for metabolites.
+            A data frame with 7 rows and 2 variables.
+            \describe{
+                \item{name}{
+                    Name of pathways resulting in metabolites pathway
+                    enrichment analysis.
+                }
+                \item{id}{
+                    Identifiers of pathways resulting in metabolites
+                    pathway enrichment analysis.
+                }
+            }
         }
-        \item{\code{resgene}}{Results of genes pathway enrichment analysis}
-        \item{\code{gened}}{Vector containing genes}
-        \item{\code{metad}}{Vector containing metabolites}
+        \item{resgene}{
+            Pathway enrichment analysis results for genes.
+            A data frame with 11 rows and 2 variables.
+            \describe{
+                \item{name}{
+                    Name of pathways resulting in genes pathway
+                    enrichment analysis.
+                }
+                \item{id}{
+                    Identifiers of pathways resulting in genes
+                    pathway enrichment analysis.
+                }
+            }
+        }
+        \item{gened}{Vector containing user's genes (ACAA1, SLC6A12)}
+        \item{metad}{Vector containing user's metabolites (C00002, C00719)}
     }
 }
 \references{

@@ -12,17 +12,17 @@ hierapath=etape_donnees[[18]];inter_values=etape_donnees[[21]];gene_notin=etape_
 sub=etape_donnees[[23]]
 
 test_that("informations are good", {
-  expect_equal(nrow(heatmap),15)
+  expect_equal(nrow(heatmap),16)
   expect_equal(nrow(go_genelist),13)
   expect_equal(nrow(types),12)
   expect_equal(length(genetype),3)
-  expect_equal(nrow(gomf_tab),95)
-  expect_equal(nrow(gobp_tab),109)
+  expect_equal(nrow(gomf_tab),93)
+  expect_equal(nrow(gobp_tab),107)
   expect_equal(length(gomflist),3)
   expect_equal(length(gobplist),5)
   expect_equal(length(hierabrite),3)
   expect_equal(length(hierapath),3)
-  expect_equal(nrow(inter_values),15)
+  expect_equal(nrow(inter_values),16)
   expect_equal(nrow(gene_notin),1)
-  expect_equal(nrow(sub),15)
+  expect_equal(nrow(sub),16)
 })
