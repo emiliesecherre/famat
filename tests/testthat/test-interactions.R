@@ -12,4 +12,3 @@ test_that("interactions are well extracted", {
   expect_equal(length(central),138)
   expect_equal(nrow(no_path),1)
 })
-
