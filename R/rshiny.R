@@ -174,10 +174,10 @@ rshiny=function(listdata){
     genetype<-listdata[[7]];metatab<-listdata[[8]];genetab<-listdata[[9]];
     intetab<-listdata[[10]];gomf_tab<-listdata[[11]];gobp_tab<-listdata[[12]];
     genes<-listdata[[13]];gomflist<-listdata[[14]];gobplist<-listdata[[15]];
-    namegeneid<-listdata[[16]];hierabrite<-listdata[[17]];
-    hierapath<-listdata[[18]];save_cluster_elem<-listdata[[19]]
-    centrality<-listdata[[20]];inter_values<-listdata[[21]]
-    gene_notin<-listdata[[22]];sub<-listdata[[23]]
+    hierabrite<-listdata[[16]];
+    hierapath<-listdata[[17]];save_cluster_elem<-listdata[[18]]
+    centrality<-listdata[[19]];inter_values<-listdata[[20]]
+    gene_notin<-listdata[[21]];sub<-listdata[[22]]
 
     gotermsgene<-c(allResBP[allResBP[, 1] %in% go_genelist$go_id, 2],
                     allResMF[allResMF[, 1] %in% go_genelist$go_id, 2])

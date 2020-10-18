@@ -10,7 +10,7 @@
 }
 \usage{data("compl_data_result")}
 \format{
-    List of 23 items.
+    List of 22 items.
     \describe{
         \item{heatmap}{
             Dataframe heatmap-like, with in abscissa elements of pathways
@@ -292,18 +292,6 @@
             List containing GO BP terms hierarchies, with indices in the joliMF
             dataframe and genes concerned by the hierarchy.
             A list of 5 items.
-        }
-        \item{namegeneid}{
-            Dataframe containing all human genes symbols and names.
-            A data frame with 39946 rows and 2 variables.
-            \describe{
-                \item{hgnc_symbol}{
-                    Gene symbols of all human genes.
-                }
-                \item{entregene_description}{
-                    Names of all human genes.
-                }
-            }
         }
         \item{hierabrite}{
             List of pathways categories, containing pathways concerned by a

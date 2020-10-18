@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 0.99.4 (2020-10-16)
+
+* Removed biomart package
+
 # Changes in version 0.99.3 (2020-10-16)
 
 * Updated NEWS file

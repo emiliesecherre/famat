@@ -604,12 +604,7 @@ final_tab<-function(build_hm, pathways, size, sorted_path, no_path,
 }
 
 ##perform go term enrichment analysis
-enr_go<-function(genes,ensembl){
-    ##gene-go terms mapping
-    go_gene<-biomaRt::getBM(attributes=c("hgnc_symbol", 'go_id'), mart=ensembl)
-    go_gene<-go_gene[!(go_gene$go_id == ""),]
-    go_gene<-go_gene[!(go_gene$hgnc_symbol == ""),]
-
+enr_go<-function(genes){
     ##entrez genes ids for user's genes
     genes_entrez<-gprofiler2::gconvert(genes, organism="hsapiens",
                                         target='ENTREZGENE_ACC')$target
@@ -628,7 +623,7 @@ enr_go<-function(genes,ensembl){
 
 #build dataframes showing informations about elements and their interactions
 infos_elem<-function(genes, notin_path, meta, keggchebiname, no_path,
-                        go_genelist, namegeneid){
+                        go_genelist){
     #genes informations
     pre_genetab<-vapply(genes,function(g){
         gene_name<-namegeneid[namegeneid$hgnc_symbol == g, 2]
@@ -867,7 +862,7 @@ build_genetype<-function(genetab, map_gene_uni, typemf, typebp){
 }
 
 #gene types=uniprot keywords from BP and MF
-type_elem<-function(genetab,ensembl){
+type_elem<-function(genetab){
     uniprotkw<-readLines('https://www.uniprot.org/docs/keywlist', warn=FALSE)
     mf_keywords<-uniprotkw[which(stringr::str_sub(uniprotkw, 1, 24)
                                     %in% "HI   Molecular function:")]
@@ -900,10 +895,7 @@ type_elem<-function(genetab,ensembl){
     }, list(1))
     typebp<-rm_vector(unname(unlist(typebp)))
     typebp<-typebp[typebp != ""]
-    map_gene_uni<-biomaRt::getBM(attributes=c("hgnc_symbol",
-                                'uniprotswissprot'), filters="hgnc_symbol",
-                                values=genetab$id, mart=ensembl)
-    map_gene_uni<-rm_df(map_gene_uni[map_gene_uni[, 2]!="", ])
+    map_gene_uni<-map_gene_uni[map_gene_uni[,1] %in% genetab$id, ]
     genetype<-build_genetype(genetab, map_gene_uni, typemf, typebp)
     return(genetype)
 }
@@ -1044,10 +1036,10 @@ filter_path<-function(tagged,size){
 
 compl_data<-function(listparam){
     size<-listparam[[1]]; pathways<-listparam[[2]]; tagged<-listparam[[3]];
-    namegeneid<-listparam[[4]]; keggchebiname<-listparam[[5]];
-    central<-listparam[[6]]; no_path<-listparam[[7]]; ensembl<-listparam[[10]];
-    gene_list<-rm_vector(listparam[[8]]);
-    meta_list<-rm_vector(listparam[[9]]);list_elem<-c(gene_list, meta_list)
+    keggchebiname<-listparam[[4]];
+    central<-listparam[[5]]; no_path<-listparam[[6]];
+    gene_list<-rm_vector(listparam[[7]]);
+    meta_list<-rm_vector(listparam[[8]]);list_elem<-c(gene_list, meta_list)
 
     sorted_path<-filter_path(tagged,size)
     listpath<-sort_hiera(sorted_path)
@@ -1059,18 +1051,18 @@ compl_data<-function(listparam){
                         list_elem, tagged)
     heatmap<-listtab[[1]]; notin_path<-listtab[[2]]; hierapath<-listtab[[3]]
     save_cluster_elem<-listtab[[4]]
-    listgo<-enr_go(gene_list,ensembl) #go terms enrichment
+    listgo<-enr_go(gene_list) #go terms enrichment
     go_genelist<-listgo[[1]]; allResBP<-listgo[[2]]; allResMF<-listgo[[3]]
     listelm<-infos_elem(gene_list, notin_path, meta_list, keggchebiname,
-                        no_path, go_genelist, namegeneid)
+                        no_path, go_genelist)
     genetab<-listelm[[1]]; metatab<-listelm[[2]]; intetab<-listelm[[3]]
     gene_notin<-listelm[[4]];heatmap[heatmap == "X"]<-1
     heatmap[is.na(heatmap)]<-0; heatmap[heatmap[,1] == 0, 1]<-""
     listype<-type_path(sorted_path, hierapath)
     types<-listype[[1]]; hierabrite<-listype[[2]]
-    genetype<-type_elem(genetab,ensembl)
+    genetype<-type_elem(genetab)
+    listparam[[7]]<-rm_vector(listparam[[7]])
     listparam[[8]]<-rm_vector(listparam[[8]])
-    listparam[[9]]<-rm_vector(listparam[[9]])
     listval<-values_shiny(heatmap, central, size, tagged, gene_list, meta_list)
     centrality<-listval[[1]]; inter_values<-listval[[2]]; sub<-listval[[3]]
     intetab<-cbind(intetab, cat=rep(NA, nrow(intetab)))
@@ -1087,7 +1079,7 @@ compl_data<-function(listparam){
     gomflist<-list_go(gomf_tab);gobplist<-list_go(gobp_tab)
     return(list(heatmap, meta_list, allResBP, go_genelist, allResMF, types,
                 genetype, metatab, genetab, intetab, gomf_tab, gobp_tab,
-                gene_list, gomflist, gobplist, namegeneid,hierabrite,
+                gene_list, gomflist, gobplist, hierabrite,
                 hierapath, save_cluster_elem, centrality, inter_values,
                 gene_notin, sub))
 }

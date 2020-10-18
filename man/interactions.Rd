@@ -38,7 +38,6 @@
         Dataframe containing direct interactions between elements from the
         user's list per pathways
     }
-    \item{namegeneid}{Dataframe containing all human genes symbols and names}
     \item{keggchebiname}{
         Dataframe containing all human metabolites ids (kegg and chebi) and
         names
@@ -54,10 +53,6 @@
     }
     \item{genes}{User's genes given in \code{path_enrich} function}
     \item{meta}{User's metabolites given in \code{path_enrich} function}
-    \item{ensembl}{
-        Result of useMart("ensembl", dataset="hsapiens_gene_ensembl")
-        function of BiomaRt
-    }
     This list is used by \code{compl_data} function.
 }
 \references{
