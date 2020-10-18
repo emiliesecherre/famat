@@ -12,7 +12,7 @@
 }
 \usage{data("interactions_result")}
 \format{
-    List of 10 items.
+    List of 8 items.
     \describe{
         \item{size}{
             Description on which elements (from user's list or not) are
@@ -103,18 +103,6 @@
                 }
             }
         }
-        \item{namegeneid}{
-            Dataframe containing all human genes symbols and names.
-            A data frame with 39946 rows and 2 variables.
-            \describe{
-                \item{hgnc_symbol}{
-                    Gene symbols of all human genes.
-                }
-                \item{entregene_description}{
-                    Names of all human genes.
-                }
-            }
-        }
         \item{keggchebiname}{
             Dataframe containing all human metabolites ids (kegg and chebi)
             and names.
@@ -171,11 +159,6 @@
         }
         \item{genes}{Vector containing user's genes (ACAA1, SLC6A12)}
         \item{meta}{Vector containing user's metabolites (C00002, C00719)}
-        \item{\code{ensembl}}{
-            Result of useMart("ensembl", dataset="hsapiens_gene_ensembl")
-            function of BiomaRt.
-            An S4 object of class Mart.
-        }
     }
 }
 \source{

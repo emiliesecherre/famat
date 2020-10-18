@@ -67,7 +67,6 @@
         List containing GO BP terms hierarchies, with indices in the joliMF
         dataframe and genes concerned by the hierarchy
     }
-    \item{namegeneid}{Dataframe containing all human genes symbols and names}
     \item{hierabrite}{
         List of pathways categories, containing pathways concerned by a
         category and their indices in "trait" dataframe

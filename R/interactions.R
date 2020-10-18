@@ -153,9 +153,6 @@ interactions<-function(listk, listr, listw){
     keggchebiname<-keggchebiname[which(!is.na(keggchebiname[,1])), ]
     keggchebiname<-keggchebiname[which(!is.na(keggchebiname[,2])), ]
     keggchebiname<-keggchebiname[which(!is.na(keggchebiname[,3])), ]
-    ensembl <- biomaRt::useMart("ensembl", dataset="hsapiens_gene_ensembl")
-    namegeneid<-biomaRt::getBM(
-        attributes=c("hgnc_symbol", "entrezgene_description"), mart=ensembl)
     interac<-interac[which(interac[, 4] %in% pathtot[, 2]), ]
     ##Data informations
     meta<-rm_vector(keggname[which(keggname$kegg
@@ -172,6 +169,6 @@ interactions<-function(listk, listr, listw){
     list_filter<-filter_inter(interac)
     tagged<-list_filter[[1]]; no_path<-list_filter[[2]]
 
-    return(list(size, pathtot, tagged, namegeneid, keggchebiname, central,
-                                                no_path, genes, meta, ensembl))
+    return(list(size, pathtot, tagged, keggchebiname, central,
+                                                no_path, genes, meta))
 }
