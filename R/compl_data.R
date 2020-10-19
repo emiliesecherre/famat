@@ -811,45 +811,9 @@ type_path<-function(sorted_path, hierapath){
     return(list(types, hieratypes))
 }
 
-##build genetype list using uniprot keywords from BP and MF
-##if a gene has only BP keywords, collect these keywords and see if others
-##genes are concerned by them
-build_genetype<-function(genetab, map_gene_uni, typemf, typebp){
-    bp_terms<-apply(genetab, 1, function(g){
-        if(g[1] %in% map_gene_uni$hgnc_symbol){
-            gene_kw<-stringr::str_split(UniprotR::GetProteinAnnontate(
-                map_gene_uni[which(map_gene_uni$hgnc_symbol %in%
-                                        g[1]), 2] , "keywords"), ";")[[1]]
-            if(length(gene_kw[gene_kw %in% typemf]) == 0){
-                genestoadd<-vapply(gene_kw, function(w){
-                    if((w %in% typebp) == TRUE){
-                        list(c(w, g[1]))
-                    }
-                    else{list(NULL)}
-                }, list(1))
-                unname(unlist(genestoadd))
-            }
-        }
-    })
-    bp_terms<-as.data.frame(matrix(unname(unlist(bp_terms)),ncol=2,byrow=TRUE))
-
-    genes_bp<-rm_vector(bp_terms[,1]) #BP keywords from previous loop
-    mf_terms<-apply(genetab,1,function(e){
-        if(e[1] %in% map_gene_uni$hgnc_symbol){
-            gene_kw<-stringr::str_split(UniprotR::GetProteinAnnontate(
-                map_gene_uni[which(map_gene_uni$hgnc_symbol %in%
-                                        e[1]), 2] , "keywords"), ";")[[1]]
-            genestoadd<-vapply(gene_kw, function(w){
-                if((w %in% typemf) == TRUE || (w %in% genes_bp) == TRUE){
-                    list(c(w, e[1]))
-                }
-                else{list(NULL)}
-            }, list(1))
-            unname(unlist(genestoadd))
-        }
-    })
-    mf_terms<-as.data.frame(matrix(unname(unlist(mf_terms)),ncol=2,byrow=TRUE))
-    pre_genetype<-rm_df(rbind(bp_terms,mf_terms), c(1,2))
+#gene types=uniprot keywords from BP and MF
+type_elem<-function(genetab){
+    pre_genetype<-uni_terms[uni_terms[,2] %in% genetab[,1],]
     genetype<-vapply(unique(pre_genetype[,1]), function(u){
         list(pre_genetype[which(pre_genetype[,1] %in% u), 2])
     }, list(1))
@@ -858,45 +822,6 @@ build_genetype<-function(genetab, map_gene_uni, typemf, typebp){
     if(length(genetab$id[!(genetab$id %in% genes_with_kw)])>0){
         genetype[["unknown"]]<-genetab$id[!(genetab$id %in% genes_with_kw)]
     }
-    return(genetype)
-}
-
-#gene types=uniprot keywords from BP and MF
-type_elem<-function(genetab){
-    uniprotkw<-readLines('https://www.uniprot.org/docs/keywlist', warn=FALSE)
-    mf_keywords<-uniprotkw[which(stringr::str_sub(uniprotkw, 1, 24)
-                                    %in% "HI   Molecular function:")]
-    typemf<-vapply(mf_keywords, function(m){
-        list(stringr::str_split(m,"HI   Molecular function: "))
-    }, list(1))
-    typemf<-rm_vector(unname(unlist(typemf)))
-    typemf<-vapply(typemf, function(m){
-        list(stringr::str_split(m,"\\."))
-    }, list(1))
-    typemf<-rm_vector(unname(unlist(typemf)))
-    typemf<-vapply(typemf, function(m){
-        list(stringr::str_split(m,"; "))
-    }, list(1))
-    typemf<-rm_vector(unname(unlist(typemf)))
-    typemf<-typemf[typemf != ""]
-
-    bp_keywords<-uniprotkw[which(stringr::str_sub(uniprotkw, 1, 24)
-                                    %in% "HI   Biological process:")]
-    typebp<-vapply(bp_keywords, function(b){
-        list(stringr::str_split(b,"HI   Biological process: "))
-    }, list(1))
-    typebp<-rm_vector(unname(unlist(typebp)))
-    typebp<-vapply(typebp, function(b){
-        list(stringr::str_split(b,"\\."))
-    }, list(1))
-    typebp<-rm_vector(unname(unlist(typebp)))
-    typebp<-vapply(typebp, function(b){
-        list(stringr::str_split(b,"; "))
-    }, list(1))
-    typebp<-rm_vector(unname(unlist(typebp)))
-    typebp<-typebp[typebp != ""]
-    map_gene_uni<-map_gene_uni[map_gene_uni[,1] %in% genetab$id, ]
-    genetype<-build_genetype(genetab, map_gene_uni, typemf, typebp)
     return(genetype)
 }
 

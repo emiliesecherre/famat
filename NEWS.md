@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 0.99.7 (2020-10-19)
+
+* Removed UniprotR package
+
 # Changes in version 0.99.6 (2020-10-19)
 
 * Updated Biocmanager, devel version
