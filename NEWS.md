@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 0.99.5 (2020-10-19)
+
+* Fixed unit tests
+
 # Changes in version 0.99.4 (2020-10-16)
 
 * Removed biomart package
