@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 0.99.6 (2020-10-19)
+
+* Updated Biocmanager, devel version
+
 # Changes in version 0.99.5 (2020-10-19)
 
 * Fixed unit tests
