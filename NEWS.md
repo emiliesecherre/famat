@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 0.99.8 (2020-10-24)
+
+* Fixed unit tests
+
 # Changes in version 0.99.7 (2020-10-19)
 
 * Removed UniprotR package
