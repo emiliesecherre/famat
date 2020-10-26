@@ -3,11 +3,11 @@ Functional analysis of metabolic and transcriptomic data
 
 # Introduction
 
-The aim of `r Rpackage("famat")` is to allow users to determine functional 
+The aim of <b>famat</b> is to allow users to determine functional 
 links between metabolites and genes. These metabolites and genes lists may 
-be related to a specific experiment/study, but `r Rpackage("famat")` only 
+be related to a specific experiment/study, but <b>famat</b> only 
 needs a gene symbols list and a Kegg Compound ids list. Using these lists, 
-`r Rpackage("famat")` performs pathway enrichment analysis, direct interactions
+<b>famat</b> performs pathway enrichment analysis, direct interactions
 between elements inside pathways extraction, GO terms enrichment analysis, 
 calculation of user's elements centrality (number of direct interactions 
 between an element and others inside a pathway) and extraction of information
@@ -23,13 +23,13 @@ Functions available are: <br><ul>
 
 # Installation
 
-Run this command line to install `r Rpackage("famat")`.
+Run this command line to install <b>famat</b>.
 ```{r, eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("famat")
 ```
 
-Then, load `r Rpackage("famat")` using library.
+Then, load <b>famat</b> using library.
 ```{r load_famat, message=FALSE, warning=FALSE}
 library(famat)
