@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 0.99.9 (2020-10-26)
+
+* Updated examples data
+
 # Changes in version 0.99.8 (2020-10-24)
 
 * Fixed unit tests
