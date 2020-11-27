@@ -5,6 +5,7 @@ ui<-function(types, genetype, gotermsgene){
     ui <- shinydashboard::dashboardPage(
         skin = "blue",
         shinydashboard::dashboardHeader(title="Famat"),
+        #declare tabs
         shinydashboard::dashboardSidebar(
             shinydashboard::sidebarMenu(
                 shinydashboard::menuItem("Elements", tabName = "elements",
@@ -31,7 +32,7 @@ ui<-function(types, genetype, gotermsgene){
                 )
             )
         ),
-        shinydashboard::dashboardBody(
+        shinydashboard::dashboardBody( #custom shiny app colors
             shiny::tags$head(shiny::tags$style(shiny::HTML('
                 /* logo */
                 .skin-blue .main-header .logo {
@@ -51,7 +52,7 @@ ui<-function(types, genetype, gotermsgene){
                     background-color: #fdfefe;
                 }
             '))),
-            shinydashboard::tabItems(
+            shinydashboard::tabItems( #elements filters panel
                 shinydashboard::tabItem(tabName = "elements",
                     shiny::div(
                         style="left:240px; right:0px; bottom=0px; top=450px;
@@ -77,7 +78,7 @@ ui<-function(types, genetype, gotermsgene){
                     shiny::fluidRow(
                         shiny::verbatimTextOutput("secblank")
                     ),
-                    shiny::fluidRow(
+                    shiny::fluidRow( #boxes for elements dataframes
                         shinydashboard::box(title="Genes",
                                 DT::dataTableOutput('x2'),width=5),
                         shinydashboard::box(title="Metabolites",
@@ -87,7 +88,7 @@ ui<-function(types, genetype, gotermsgene){
                     )
                 ),
                 shinydashboard::tabItem(tabName = "pathways",
-                    shiny::div(
+                    shiny::div( #pathways filters panel
                         style="left:240px; right:0px; top=10px; position:fixed;
                         cursor:inherit; z-index: 2;",
                         shinyBS::bsCollapse(id = "collapseExample",
@@ -131,7 +132,7 @@ ui<-function(types, genetype, gotermsgene){
                     shiny::fluidRow(
                         shiny::verbatimTextOutput("firstblank")
                     ),
-                    shiny::fluidRow(
+                    shiny::fluidRow( #box for pathway heatmap
                         shinydashboard::box(title="Pathways",
                             shiny::div(style = 'overflow-x: scroll',
                                 plotly::plotlyOutput("x1", height = "100%")),
@@ -139,25 +140,25 @@ ui<-function(types, genetype, gotermsgene){
                     )
                 ),
                 shinydashboard::tabItem(tabName = "gomf",
-                    shiny::fluidRow(
+                    shiny::fluidRow( #box for go mf dataframe
                         shinydashboard::box(title="GO Molecular Function",
                                             DT::dataTableOutput('x5'))
                     )
                 ),
                 shinydashboard::tabItem(tabName = "gobp",
-                    shiny::fluidRow(
+                    shiny::fluidRow( #box for go bp dataframe
                         shinydashboard::box(title="GO Biological Process",
                                             DT::dataTableOutput('x6'))
                     )
                 ),
                 shinydashboard::tabItem(tabName = "hist",
-                    shiny::fluidRow(
+                    shiny::fluidRow( #box for history dataframe
                         shinydashboard::box(title="History",
                                             DT::dataTableOutput('x7'))
                     )
                 ),
                 shinydashboard::tabItem(tabName = "ncments",
-                    shiny::fluidRow(
+                    shiny::fluidRow( #box for no path elements dataframe
                         shinydashboard::box(title="Elements not in pathways",
                                             DT::dataTableOutput('x8'))
                     )
@@ -403,7 +404,16 @@ rshiny=function(listdata){
             v$x4_selected_rows <- NULL
             v$elements<-vector()
 
-            final_elements<-colnames(v$heatmap_shiny[,6:ncol(v$heatmap_shiny)])
+            final_elements<-vapply(hierapath, function(h){
+                if(length(intersect(v$rows, h[["index"]]))>0){
+                    list(h[["elem"]])
+                }
+                else{list(NA)}
+
+            }, list(1))
+            final_elements<-unname(unlist(final_elements))
+            final_elements<-final_elements[final_elements %in%
+                                    names(v$heatmap_shiny[,v$column])]
             selected_genes<-final_elements[final_elements %in% genes]
             selected_meta<-final_elements[final_elements %in% meta_list]
             selected_inter<-final_elements[final_elements %in% intetab$tag]
@@ -1057,7 +1067,8 @@ rshiny=function(listdata){
                                     ii[4], "\nGO term : ", ii[5], "\nPath : ",
                                     ii[6], "\nType : ", ii[7], "\nLien : ",
                                     paste(stringr::str_split(ii[3], ", ")[[1]],
-                                                        collapse="\n"), sep="")
+                                                        collapse="\n"),
+                                    "\nCategories : ", ii[8], sep="")
         })
 
 
@@ -1149,10 +1160,10 @@ rshiny=function(listdata){
         output$x4 <- DT::renderDataTable({
             input$x7_rows_selected
             input$reset
-            DT::datatable(v$intetab_shiny[, c(1, 5, 8, 7)], rownames = FALSE,
+            DT::datatable(v$intetab_shiny[, c(1, 5, 9, 7)], rownames = FALSE,
                 selection =list(mode ='multiple', selected=v$x4_selected_rows,
                 target ='row'), options=list(pageLength=nrow(v$intetab_shiny),
-                                                            rowCallback=DT::JS(
+                                                dom = 't',rowCallback=DT::JS(
                 'function(row, data) {
                     $(row).mouseenter(function(){
                         var inte_index = $(this)[0]._DT_RowIndex
@@ -1190,7 +1201,7 @@ rshiny=function(listdata){
         output$walk<-shiny::renderText({
             input$x2_rows_selected
             input$x3_rows_selected
-            paste("walk :", paste(v$walk, collapse=" "), "\nexcluded :",
+            paste("included :", paste(v$walk, collapse=" "), "\nexcluded :",
                                     paste(v$a_not_b, collapse=" "), sep=" ")
         })
         output$firstblank<-shiny::renderText({

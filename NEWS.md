@@ -1,5 +1,13 @@
 # *News*
 
+# Changes in version 1.0.1 (2020-11-27)
+
+* Rshiny modifications for figure in paper
+
+# Changes in version 1.0.0 (2020-10-28)
+
+* Push on bioconductor
+
 # Changes in version 0.99.9 (2020-10-26)
 
 * Updated examples data

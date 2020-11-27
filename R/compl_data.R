@@ -212,7 +212,7 @@ sort_go_steps<-function(links, res_enrich){
 ##for ordered walks beginning with the same root, this function goes from the
 ##last walk to the second. For a node, if in the walk above the walk studied
 ##there is the same node at the same position in the hierarchy, remove this
-##node. IN the dataframe, the position is the column. So, nodes in the df
+##node. In the dataframe, the position is the column. So, nodes in the df
 ##will look like a tree.
 tree_view<-function(walks){
     row.names(walks)=as.character(seq_len(nrow(walks)))
@@ -635,9 +635,9 @@ infos_elem<-function(genes, notin_path, meta, keggchebiname, no_path,
     gene_notin<-pre_genetab[which(pre_genetab[,1] %in% notin_path),]
     row.names(genetab)=seq_len(nrow(genetab))
     row.names(gene_notin)=seq_len(nrow(gene_notin))
-    names(genetab)<-names(gene_notin)<-c("id","name")
-    genetab<-genetab[order(genetab$id), ]
-    gene_notin<-gene_notin[order(gene_notin$id), ]
+    names(genetab)<-names(gene_notin)<-c("gene_symbol","name")
+    genetab<-genetab[order(genetab[,1]), ]
+    gene_notin<-gene_notin[order(gene_notin[,1]), ]
 
     #metabolites informations
     metatab<-vapply(meta, function(m){
@@ -646,7 +646,7 @@ infos_elem<-function(genes, notin_path, meta, keggchebiname, no_path,
     }, character(2))
     metatab<-as.data.frame(t(metatab))
     row.names(metatab)=seq_len(nrow(metatab))
-    names(metatab)<-c("id", "name")
+    names(metatab)<-c("name", "chebi_id")
     metatab<-metatab[order(metatab$name), ]
 
     #interactions informations
@@ -819,8 +819,8 @@ type_elem<-function(genetab){
     }, list(1))
 
     genes_with_kw<-rm_vector(unname(unlist(genetype)))
-    if(length(genetab$id[!(genetab$id %in% genes_with_kw)])>0){
-        genetype[["unknown"]]<-genetab$id[!(genetab$id %in% genes_with_kw)]
+    if(length(genetab[,1][!(genetab[,1] %in% genes_with_kw)])>0){
+        genetype[["unknown"]]<-genetab[,1][!(genetab[,1] %in% genes_with_kw)]
     }
     return(genetype)
 }
@@ -990,15 +990,17 @@ compl_data<-function(listparam){
     listparam[[8]]<-rm_vector(listparam[[8]])
     listval<-values_shiny(heatmap, central, size, tagged, gene_list, meta_list)
     centrality<-listval[[1]]; inter_values<-listval[[2]]; sub<-listval[[3]]
-    intetab<-cbind(intetab, cat=rep(NA, nrow(intetab)))
+    intetab<-cbind(intetab, cat=rep(NA, nrow(intetab)),
+                    catnumb=rep(NA, nrow(intetab)))
     intetab<-apply(intetab, 1, function(i){
         path_cat<-stringr::str_split(i[6], ", ")[[1]]
-        c(i[seq_len(7)], paste(rm_vector(types[which(types$id
-                                            %in% path_cat),2]), collapse=", "))
+        cate<-paste(rm_vector(types[which(types$id
+                                          %in% path_cat),2]), collapse=", ")
+        c(i[seq_len(7)], cate, stringr::str_count(cate, ", ")+1)
     })
     intetab<-as.data.frame(t(intetab))
     names(intetab)<-c("tag", "first_item", "link", "sec_item", "go", "path",
-                        "type", "cat")
+                        "type", "cat", "catnumb")
     gobp_tab<-hieraGO("BP", allResBP, go_genelist)
     gomf_tab<-hieraGO("MF", allResMF, go_genelist)
     gomflist<-list_go(gomf_tab);gobplist<-list_go(gobp_tab)
