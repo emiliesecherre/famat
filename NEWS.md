@@ -1,6 +1,6 @@
 # *News*
 
-# Changes in version 1.2.0 (2020-11-27)
+# Changes in version 1.3.0 (2020-11-27)
 
 * Rshiny modifications for figure in paper
 
