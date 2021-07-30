@@ -18,10 +18,10 @@ Description:
     - hierarchies of enriched go terms using Molecular Function and 
     Biological Process.
 Authors@R: 
-    person(given = "Emilie",
-           family = "Secherre",
+    person(given = "Mathieu",
+           family = "Charles",
            role = c("aut", "cre"),
-           email = "emisecherre@gmail.com",
+           email = "mathieu.charles@inrae.fr",
            comment = c(ORCID = "0000-0001-5343-6324"))
 License: GPL-3           
 LazyData: false
