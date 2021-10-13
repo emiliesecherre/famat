@@ -1,5 +1,9 @@
 # *News*
 
+# Changes in version 1.3.1 (2021-10-13)
+
+* Fix tests
+
 # Changes in version 1.3.0 (2020-11-27)
 
 * Rshiny modifications for figure in paper
