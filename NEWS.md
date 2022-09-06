@@ -1,4 +1,7 @@
 # *News*
+# Changes in version 1.4.0 (2022-09-06)
+
+* Addes MPINet functions in the code because MPINet was removed from CRAN
 
 # Changes in version 1.3.1 (2021-10-13)
 

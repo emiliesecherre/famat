@@ -18,15 +18,15 @@ meta_path<-function(meta, db){
 
     ##perform pathway enrichment analysis on user's metabolites list
     ##extract informations about pathways from MPINet results
-    pss<-MPINet::getPSS(meta_pubchem, plot=FALSE)
+    pss<-getPSS(meta_pubchem, plot=FALSE)#removed MPINet::
     if(db == "KEGG"){
-        medium<-MPINet::identifypathway(meta_pubchem, pss, "KEGG")
+        medium<-identifypathway(meta_pubchem, pss, "KEGG")#removed MPINet::
         resm<-vapply(medium, function(x){x[[2]][[1]]}, character(1))
     }else if(db == "REAC"){
-        medium<-MPINet::identifypathway(meta_pubchem, pss, "Reactome")
+        medium<-identifypathway(meta_pubchem, pss, "Reactome")#removed MPINet::
         resm<-vapply(medium, function(x){x[[1]][[1]]}, character(1))
     }else if (db == "WP"){
-        medium<-MPINet::identifypathway(meta_pubchem, pss, "Wikipathways")
+        medium<-identifypathway(meta_pubchem, pss, "Wikipathways")#removed MPINet::
         resm<-vapply(medium, function(x){x[[1]][[1]]}, character(1))
     }
 
@@ -81,5 +81,5 @@ path_enrich<-function(source, metabo, genes){
         resmeta[,2]=unname(unlist(ids))
         resgene$id<-paste("WP", resgene$id, sep="")
     }
-    return(list(resmeta, resgene, genes, metabo))
+    return(list(resmeta, resgene, genes, metabo, resmeta))
 }
