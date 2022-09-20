@@ -47,6 +47,7 @@ BiocManager::install("famat")
 Then, load `r Rpackage("famat")` using library.
 ```{r load_famat, message=FALSE, warning=FALSE}
 library(famat)
+library(mgcv)
 ```
 
 # path_enrich
