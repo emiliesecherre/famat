@@ -18,15 +18,15 @@ meta_path<-function(meta, db){
 
     ##perform pathway enrichment analysis on user's metabolites list
     ##extract informations about pathways from MPINet results
-    pss<-getPSS(meta_pubchem, plot=FALSE)#removed MPINet::
+    #pss<-getPSS(meta_pubchem, plot=FALSE)#removed MPINet::
     if(db == "KEGG"){
-        medium<-identifypathway(meta_pubchem, pss, "KEGG")#removed MPINet::
+        medium<-identifypathway(meta_pubchem, "KEGG")#removed MPINet::
         resm<-vapply(medium, function(x){x[[2]][[1]]}, character(1))
     }else if(db == "REAC"){
-        medium<-identifypathway(meta_pubchem, pss, "Reactome")#removed MPINet::
+        medium<-identifypathway(meta_pubchem, "Reactome")#removed MPINet::
         resm<-vapply(medium, function(x){x[[1]][[1]]}, character(1))
     }else if (db == "WP"){
-        medium<-identifypathway(meta_pubchem, pss, "Wikipathways")#removed MPINet::
+        medium<-identifypathway(meta_pubchem, "Wikipathways")#removed MPINet::
         resm<-vapply(medium, function(x){x[[1]][[1]]}, character(1))
     }
 
