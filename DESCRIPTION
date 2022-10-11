@@ -1,5 +1,6 @@
 Package: famat
 Title: Functional analysis of metabolic and transcriptomic data
+<<<<<<< HEAD
 Version: 1.7.4
 Description:
     Famat is made to collect data about lists of genes and metabolites provided
