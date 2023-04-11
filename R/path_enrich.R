@@ -44,7 +44,8 @@ path_enrich<-function(source, metabo, genes){
     resmeta<-cbind(resmeta, id=rep(NA, nrow(resmeta)))
     if(source == "KEGG"){
         prev_db<-KEGGREST::keggList("pathway", "hsa")
-        idskegg=stringr::str_sub(names(prev_db), 9, nchar(names(prev_db)))
+        idskegg=sub('^hsa:?(.*)$','\\1',names(prev_db))##Modif MC 11/04/23 => change in KEGGrest-Kegg pathways names?
+        #idskegg=stringr::str_sub(names(prev_db), 9, nchar(names(prev_db)))
         idskegg=paste("hsa:",idskegg,sep="")
         keggdb<-as.list(idskegg)
         nameskegg<-unlist(stringr::str_split(unname(prev_db),

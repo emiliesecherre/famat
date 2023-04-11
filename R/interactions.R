@@ -142,11 +142,16 @@ interactions<-function(listk, listr, listw){
     pathtotk<-pathtot[which(stringr::str_sub(pathtot$id, 1, 1)=="h"), ]
     ##mappings for metabolites(chebi,kegg,name) and genes(gene symbol,name)
     keggchebi<-KEGGREST::keggConv("chebi", "compound")
-    keggchebi<-rm_df(data.frame(kegg=names(keggchebi), chebi=keggchebi),
-                    c(seq_len(2)))
+    keggchebi<-rm_df(data.frame(chebi=keggchebi, kegg=sub('^cpd:?(.*)$','\\1',names(keggchebi)),
+                                keggcpd=names(keggchebi)),c(seq_len(3)))
+    #Modif MC 11/04/23 : change in KEGGrest chebiname, add cpd?
+
+    #keggchebi<-rm_df(data.frame(kegg=names(keggchebi), chebi=keggchebi),
+    #                c(seq_len(2)))
     keggname<-KEGGREST::keggList("compound")
     keggname<-data.frame(kegg=names(keggname), name=keggname)
     name=apply(keggname,1,function(x){stringr::str_split(x[2], ";")[[1]][1]})
+    #Modif MC 11/04/23 : Do we still need that?
     keggname[,2]=unname(name)
     keggchebiname<-merge(keggchebi, keggname, by="kegg")
     keggchebiname$chebi<-stringr::str_to_upper(keggchebiname$chebi)
@@ -155,8 +160,10 @@ interactions<-function(listk, listr, listw){
     keggchebiname<-keggchebiname[which(!is.na(keggchebiname[,3])), ]
     interac<-interac[which(interac[, 4] %in% pathtot[, 2]), ]
     ##Data informations
-    meta<-rm_vector(keggname[which(keggname$kegg
-                                    %in% paste("cpd:", meta, sep="")), 2])
+    meta<-rm_vector(keggname[which(keggname$kegg %in% meta), 2])
+    #Modic MC 11/04/23: change in keggname, no cpd: anymore
+    #meta<-rm_vector(keggname[which(keggname$kegg
+    #                                %in% paste("cpd:", meta, sep="")), 2])
     size<-data_size(interac, meta, genes, keggchebiname,
                     pathtotk, pathtotr, pathtotp)
     list_elem<-c(meta, genes)
